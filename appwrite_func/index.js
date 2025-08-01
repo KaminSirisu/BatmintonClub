@@ -1,18 +1,22 @@
 const { Client, Databases, Query } = require("node-appwrite");
-const cron = require("node-cron");
-const PROJECT_ID = import.meta.env.VITE_APPWRITE_PROJECT_ID;
-const ENDPOINT = import.meta.env.VITE_APPWRITE_ENDPOINT;
 
+// Environment variables set in Appwrite Function Settings
+const PROJECT_ID = process.env.VITE_APPWRITE_PROJECT_ID;
+const ENDPOINT = process.env.VITE_APPWRITE_ENDPOINT;
+const API_KEY = process.env.VITE_APPWRITE_API_KEY;
+
+const DATABASE_ID = process.env.VITE_APPWRITE_DATABASE_ID;
+const CHECKIN_COLLECTION_ID = process.env.VITE_APPWRITE_CHECKIN_COLLECTION_ID;
+
+// Set up Appwrite client
 const client = new Client()
-  .setEndpoint(ENDPOINT) // Your Appwrite endpoint
-  .setProject(PROJECT_ID) // Your project ID
-
+  .setEndpoint(ENDPOINT)
+  .setProject(PROJECT_ID)
+  .setKey(API_KEY); // You must provide a secret API key
 
 const databases = new Databases(client);
 
-const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
-const CHECKIN_COLLECTION_ID = import.meta.env.VITE_APPWRITE_CHECKIN_COLLECTION_ID;
-
+// Delete check-ins older than 1 day
 const deleteOldCheckIns = async () => {
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
@@ -20,7 +24,7 @@ const deleteOldCheckIns = async () => {
     const docs = await databases.listDocuments(
       DATABASE_ID,
       CHECKIN_COLLECTION_ID,
-      [Query.lessThan("createAt", oneDayAgo)]  // Note the field name "createdAt"
+      [Query.lessThan("createAt", oneDayAgo)] // or "createdAt" if you use system field
     );
 
     if (docs.documents.length === 0) {
@@ -31,8 +35,8 @@ const deleteOldCheckIns = async () => {
     await Promise.all(
       docs.documents.map(doc =>
         databases.deleteDocument(DATABASE_ID, CHECKIN_COLLECTION_ID, doc.$id)
-          .then(() => console.log(`Deleted check-in: ${doc.$id}`))
-          .catch(err => console.error(`Failed to delete ${doc.$id}:`, err.message))
+          .then(() => console.log(`✅ Deleted check-in: ${doc.$id}`))
+          .catch(err => console.error(`❌ Failed to delete ${doc.$id}:`, err.message))
       )
     );
 
@@ -42,11 +46,7 @@ const deleteOldCheckIns = async () => {
   }
 };
 
-// Schedule to run every day at midnight
-cron.schedule("0 0 * * *", () => {
-  console.log("Running scheduled check-in cleanup...");
-  deleteOldCheckIns();
-});
-
-// Run the deletion immediately when script runs
-deleteOldCheckIns();
+// Run function (Appwrite will invoke this script directly)
+deleteOldCheckIns()
+  .then(() => process.exit(0))
+  .catch(() => process.exit(1));
