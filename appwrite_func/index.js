@@ -1,5 +1,5 @@
 const { Client, Databases, Query } = require("node-appwrite");
-import cron from "node-cron";
+const cron = require("node-cron");
 const PROJECT_ID = import.meta.env.VITE_APPWRITE_PROJECT_ID;
 const ENDPOINT = import.meta.env.VITE_APPWRITE_ENDPOINT;
 
