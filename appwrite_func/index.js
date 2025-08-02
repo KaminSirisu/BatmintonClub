@@ -1,52 +1,38 @@
-const { Client, Databases, Query } = require("node-appwrite");
+const sdk = require("node-appwrite");
 
-// Environment variables set in Appwrite Function Settings
-const PROJECT_ID = process.env.VITE_APPWRITE_PROJECT_ID;
-const ENDPOINT = process.env.VITE_APPWRITE_ENDPOINT;
-const API_KEY = process.env.VITE_APPWRITE_API_KEY;
+module.exports = async function (req, res) {
+  const client = new sdk.Client()
+    .setEndpoint(process.env.APPWRITE_ENDPOINT)
+    .setProject(process.env.APPWRITE_PROJECT_ID)
+    .setKey(process.env.APPWRITE_API_KEY);
 
-const DATABASE_ID = process.env.VITE_APPWRITE_DATABASE_ID;
-const CHECKIN_COLLECTION_ID = process.env.VITE_APPWRITE_CHECKIN_COLLECTION_ID;
+  const databases = new sdk.Databases(client);
 
-// Set up Appwrite client
-const client = new Client()
-  .setEndpoint(ENDPOINT)
-  .setProject(PROJECT_ID)
-  .setKey(API_KEY); // You must provide a secret API key
-
-const databases = new Databases(client);
-
-// Delete check-ins older than 1 day
-const deleteOldCheckIns = async () => {
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
   try {
     const docs = await databases.listDocuments(
-      DATABASE_ID,
-      CHECKIN_COLLECTION_ID,
-      [Query.lessThan("createAt", oneDayAgo)] // or "createdAt" if you use system field
+      process.env.APPWRITE_DATABASE_ID,
+      process.env.APPWRITE_CHECKIN_COLLECTION_ID,
+      [sdk.Query.lessThan("createAt", oneDayAgo)]
     );
 
-    if (docs.documents.length === 0) {
-      console.log("No old check-ins to delete.");
-      return;
+    for (const doc of docs.documents) {
+      await databases.deleteDocument(
+        process.env.APPWRITE_DATABASE_ID,
+        process.env.APPWRITE_CHECKIN_COLLECTION_ID,
+        doc.$id
+      );
     }
 
-    await Promise.all(
-      docs.documents.map(doc =>
-        databases.deleteDocument(DATABASE_ID, CHECKIN_COLLECTION_ID, doc.$id)
-          .then(() => console.log(`✅ Deleted check-in: ${doc.$id}`))
-          .catch(err => console.error(`❌ Failed to delete ${doc.$id}:`, err.message))
-      )
-    );
-
-    console.log(`✅ Deleted ${docs.documents.length} old check-ins.`);
-  } catch (err) {
-    console.error("❌ Error deleting check-ins:", err.message);
+    res.json({
+      success: true,
+      deleted: docs.documents.length,
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      error: error.message,
+    });
   }
 };
-
-// Run function (Appwrite will invoke this script directly)
-deleteOldCheckIns()
-  .then(() => process.exit(0))
-  .catch(() => process.exit(1));
