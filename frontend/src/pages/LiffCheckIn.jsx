@@ -22,11 +22,11 @@ function LiffCheckIn() {
                     throw new Error('VITE_LIFF_ID is missing.');
                 }
 
+                await liff.init({ liffId: LIFF_ID });
+
                 if (!clubId) {
                     throw new Error('The QR code is missing clubId.');
                 }
-
-                await liff.init({ liffId: LIFF_ID });
 
                 if (!liff.isLoggedIn()) {
                     liff.login({
