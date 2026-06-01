@@ -758,7 +758,15 @@ const CourtPlayer = ({ checkedPlayers }) => {
         {showSuggest && suggestedMatch && suggestedMatch.length > 0 && (
           <div className="z-50 fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
             <div className="bg-white mx-3 md:mx-6 p-4 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <h2 className="mb-3 font-bold text-lg">{t('suggest')}</h2>
+              <div className="flex justify-between items-center mb-2 sm:mb-4">
+                <h2 className="font-bold text-lg">{t('suggest')}</h2>
+                <button
+                  onClick={() => setShowSuggest(false)}
+                  className='text-gray-500 hover:text-gray-800 text-3xl transition'
+                >
+                  x
+                </button>
+              </div>
 
               <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
                 {suggestedMatch.map((match, index) => (
@@ -791,12 +799,12 @@ const CourtPlayer = ({ checkedPlayers }) => {
                   </MotionDiv>
                 ))}
               </div>
-              <button
+              {/* <button
                 onClick={() => setShowSuggest(false)}
                 className="bg-gray-400 hover:bg-gray-500 mt-4 py-2 rounded-lg w-full text-white"
               >
                 {t('close')}
-              </button>
+              </button> */}
             </div>
           </div>
         )}

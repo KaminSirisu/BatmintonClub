@@ -122,6 +122,11 @@ const Dashboard = () => {
         (statusDisplayOrder[a.status] ?? Number.MAX_SAFE_INTEGER) -
         (statusDisplayOrder[b.status] ?? Number.MAX_SAFE_INTEGER);
       if (statusGap !== 0) return statusGap;
+      if (a.status === 'FINISHED') {
+        const aFinishedAt = Date.parse(a.updatedAt || a.startTime) || 0;
+        const bFinishedAt = Date.parse(b.updatedAt || b.startTime) || 0;
+        if (aFinishedAt !== bFinishedAt) return bFinishedAt - aFinishedAt;
+      }
       return String(a.id).localeCompare(String(b.id));
     });
   }, [matches]);

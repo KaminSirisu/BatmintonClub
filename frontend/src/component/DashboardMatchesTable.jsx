@@ -5,12 +5,18 @@ const parseSetScores = (matchScore) => {
   return matchScore.split(',').map((score) => score.trim()).filter(Boolean);
 };
 
-const getLastSetPoints = (sets) => {
-  if (!sets.length) return null;
-  const last = sets[sets.length - 1];
-  const [a, b] = last.split('-').map(Number);
-  if (isNaN(a) || isNaN(b)) return null;
-  return { a, b };
+const getTotalScore = (sets) => {
+  return sets.reduce(
+    (total, set) => {
+      const [a, b] = set.split('-').map(Number);
+      if (!Number.isNaN(a) && !Number.isNaN(b)) {
+        if (a > b) total.teamA += 1;
+        if (b > a) total.teamB += 1;
+      }
+      return total;
+    },
+    { teamA: 0, teamB: 0 }
+  );
 };
 
 const getStatusStyle = (status) => {
@@ -38,7 +44,7 @@ const getStatusStyle = (status) => {
 const MatchRow = ({ match }) => {
   const { t } = useLanguage();
   const sets = parseSetScores(match.matchScore);
-  const lastSet = getLastSetPoints(sets);
+  const totalScore = getTotalScore(sets);
 
   const teamAPlayers = match.players.slice(0, 2);
   const teamBPlayers = match.players.slice(2, 4);
@@ -49,29 +55,27 @@ const MatchRow = ({ match }) => {
   const isPlaying = match.status === 'PLAYING';
   const isFinished = match.status === 'FINISHED';
 
-  const statusLabel = isWaiting
-    ? t('WAITING')
-    : isPlaying
-      ? t('PLAYING')
-      : isFinished
-        ? t('FINISHED')
-        : match.status;
-
-  const matchNum = String(match.matchNumber ?? match.courtNumber ?? '').padStart(2, '0') || '--';
+  const matchCourt = String(match.court ?? '').padStart(2, '0') || '--';
   const style = getStatusStyle(match.status);
 
   return (
-    <div className={`relative bg-white rounded-[18px] border overflow-hidden ${style.card}`}>
+    <div className={`relative bg-white rounded-[10px] border-[1px] overflow-hidden ${style.card}`}>
       {/* Left accent stripe */}
       {style.accent && (
-        <div className={`absolute inset-y-0 left-0 w-1 ${style.accent}`} />
+        <div className={`absolute inset-y-0 left-0 w-1.5 ${style.accent}`} />
       )}
 
-      <div className="flex items-center pl-3 pr-3 py-1 gap-2.5">
+      <div className="flex items-center pl-3 pr-3 py-1 gap-1">
         {/* Match # + badge */}
-        <div className="flex flex-col items-start gap-1 w-[68px] flex-shrink-0">
-          <span className="text-[8px] sm:text-[10px] text-gray-400 font-semibold">#{matchNum}</span>
-          <span className={`inline-flex items-center gap-1 text-[8px] sm:text-[10px] font-semibold px-2 py-0.5 rounded-full ${style.badge}`}>
+        <div className="flex flex-col items-start gap-1 w-[10px] flex-shrink-0">
+          <span className="text-[8px] sm:text-[10px] text-gray-400 font-semibold">#{matchCourt}</span>
+          {isPlaying && (
+            <span className="relative flex w-2 h-2">
+              <span className="absolute inline-flex w-full h-full rounded-full bg-red-400 opacity-75 animate-ping" />
+              <span className="relative inline-flex w-2 h-2 rounded-full bg-red-500" />
+            </span>
+          )}
+          {/* <span className={`inline-flex items-center gap-1 text-[8px] sm:text-[10px] font-semibold px-2 py-0.5 rounded-full ${style.badge}`}>
             {isPlaying && (
               <span className="relative flex w-1.5 h-1.5">
                 <span className="absolute inline-flex w-full h-full rounded-full bg-red-400 opacity-75 animate-ping" />
@@ -79,7 +83,7 @@ const MatchRow = ({ match }) => {
               </span>
             )}
             {statusLabel}
-          </span>
+          </span> */}
         </div>
 
         {/* Team A */}
@@ -93,13 +97,13 @@ const MatchRow = ({ match }) => {
         </div>
 
         {/* Center: time + score */}
-        <div className="flex flex-col items-center flex-shrink-0 w-[54px]">
+        <div className="flex flex-col items-center flex-shrink-0 w-[40px]">
           <div className="text-[12px] sm:text-[15px] font-black text-gray-900 leading-none">
             {isWaiting ? 'VS' : `${match.totalTime ?? '-'}'`}
           </div>
-          {!isWaiting && lastSet && (
+          {isFinished && (
             <div className="text-[11px] text-gray-400 mt-0.5">
-              {lastSet.a} : {lastSet.b}
+              {totalScore.teamA} : {totalScore.teamB}
             </div>
           )}
         </div>

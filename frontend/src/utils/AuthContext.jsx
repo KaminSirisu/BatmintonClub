@@ -654,6 +654,7 @@ export const AuthProvider = ({ children }) => {
         totalTime: doc.totalTime,
         matchScore: doc.matchScore || '',
         winningTeam: doc.winningTeam || '',
+        updatedAt: doc.$updatedAt,
       }));
     } catch (e) {
       console.error('Failed to fetch dashboard matches:', e);
@@ -681,6 +682,7 @@ export const AuthProvider = ({ children }) => {
           totalTime: payload.totalTime,
           matchScore: payload.matchScore || '',
           winningTeam: payload.winningTeam || '',
+          updatedAt: payload.$updatedAt,
         };
 
         onEvent({ events, match, payload });
