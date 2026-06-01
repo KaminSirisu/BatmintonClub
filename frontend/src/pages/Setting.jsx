@@ -262,38 +262,38 @@ const Setting = () => {
                   <input
                     type="time"
                     name="startTime"
-                    placeholder="Start Time"
+                    placeholder={t('startTime')}
                     className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full text-sm md:text-base"
                   />
                   <label htmlFor="endTime" className="text-[12px] text-gray-600 md:text-base">{t('endTime')}</label>
                   <input
                     type="time"
                     name="endTime"
-                    placeholder="End Time"
+                    placeholder={t('endTime')}
                     className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full text-sm md:text-base"
                   />
-                  <label htmlFor="paymentBank" className="text-[12px] text-gray-600 md:text-base">Payment Bank (e.g., KBank)</label>
+                  <label htmlFor="paymentBank" className="text-[12px] text-gray-600 md:text-base">{t('Payment Bank (e.g., KBank)')}</label>
                   <input
                     type="text"
                     name="paymentBank"
-                    placeholder="Payment Bank"
+                    placeholder={t('Payment Bank')}
                     className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full text-[10px] md:text-base"
                   />
-                  <label htmlFor="paymentAccountName" className="text-[12px] text-gray-600 md:text-base">Account Holder Name</label>
+                  <label htmlFor="paymentAccountName" className="text-[12px] text-gray-600 md:text-base">{t('Account Holder Name')}</label>
                   <input
                     type="text"
                     name="paymentAccountName"
-                    placeholder="Account Holder Name"
+                    placeholder={t('Account Holder Name')}
                     className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full text-[10px] md:text-base"
                   />
-                  <label htmlFor="paymentAccountNumber" className="text-[12px] text-gray-600 md:text-base">Account Number</label>
+                  <label htmlFor="paymentAccountNumber" className="text-[12px] text-gray-600 md:text-base">{t('Account Number')}</label>
                   <input
                     type="text"
                     name="paymentAccountNumber"
-                    placeholder="Account Number"
+                    placeholder={t('Account Number')}
                     className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full text-[10px] md:text-base"
                   />
-                  <label htmlFor="paymentQR" className="text-[12px] text-gray-600 md:text-base">Payment QR Code</label>
+                  <label htmlFor="paymentQR" className="text-[12px] text-gray-600 md:text-base">{t('Payment QR Code')}</label>
                   <input
                     type="file"
                     name="paymentQR"
@@ -310,7 +310,7 @@ const Setting = () => {
                   />
                   {paymentQrPreview && (
                     <div className="flex justify-center">
-                      <img src={paymentQrPreview} alt="QR Preview" className="w-24 h-24 border rounded" />
+                      <img src={paymentQrPreview} alt={t('QR Preview')} className="w-24 h-24 border rounded" />
                     </div>
                   )}
                   <button
@@ -361,7 +361,7 @@ const Setting = () => {
                                 </button>
                                 <button
                                   onClick={async () => {
-                                    if (window.confirm("Are you sure you want to delete this club?")) {
+                                    if (window.confirm(t("Are you sure you want to delete this club?"))) {
                                       await deleteClub(club[i].id);
                                       await fetchClubs();
                                     }
@@ -478,11 +478,11 @@ const Setting = () => {
                         required
                       />
                       <label htmlFor="paymentBank" className="text-[12px] text-gray-600 md:text-base">
-                        Payment Bank
+                        {t('Payment Bank')}
                       </label>
                       <input
                         type="text"
-                        placeholder="Payment Bank"
+                        placeholder={t('Payment Bank')}
                         value={editFormData.paymentBank}
                         onChange={(e) =>
                           setEditFormData({ ...editFormData, paymentBank: e.target.value })
@@ -490,11 +490,11 @@ const Setting = () => {
                         className="p-1 border rounded"
                       />
                       <label htmlFor="paymentAccountName" className="text-[12px] text-gray-600 md:text-base">
-                        Account Holder Name
+                        {t('Account Holder Name')}
                       </label>
                       <input
                         type="text"
-                        placeholder="Account Holder Name"
+                        placeholder={t('Account Holder Name')}
                         value={editFormData.paymentAccountName}
                         onChange={(e) =>
                           setEditFormData({ ...editFormData, paymentAccountName: e.target.value })
@@ -502,11 +502,11 @@ const Setting = () => {
                         className="p-1 border rounded"
                       />
                       <label htmlFor="paymentAccountNumber" className="text-[12px] text-gray-600 md:text-base">
-                        Account Number
+                        {t('Account Number')}
                       </label>
                       <input
                         type="text"
-                        placeholder="Account Number"
+                        placeholder={t('Account Number')}
                         value={editFormData.paymentAccountNumber}
                         onChange={(e) =>
                           setEditFormData({ ...editFormData, paymentAccountNumber: e.target.value })
@@ -514,7 +514,7 @@ const Setting = () => {
                         className="p-1 border rounded"
                       />
                       <label htmlFor="editPaymentQR" className="text-[12px] text-gray-600 md:text-base">
-                        Payment QR Code
+                        {t('Payment QR Code')}
                       </label>
                       <input
                         type="file"
@@ -533,11 +533,11 @@ const Setting = () => {
                       />
                       {editPaymentQrPreview ? (
                         <div className="flex justify-center">
-                          <img src={editPaymentQrPreview} alt="QR Preview" className="w-20 h-20 border rounded" />
+                          <img src={editPaymentQrPreview} alt={t('QR Preview')} className="w-20 h-20 border rounded" />
                         </div>
                       ) : (
                         <p className="text-gray-500 text-xs md:text-sm">
-                          No QR linked to this club yet.
+                          {t('No QR linked to this club yet.')}
                         </p>
                       )}
                       <div className="flex justify-end gap-2 mt-4">

@@ -95,7 +95,7 @@ const CourtPlayer = ({ checkedPlayers }) => {
     const suggestions = [];
 
     if (availablePlayers.length < 4) {
-      toast.error("Not enough players to generate suggestions");
+      toast.error(t("Not enough players to generate suggestions"));
       return [];
     }
 
@@ -151,7 +151,7 @@ const CourtPlayer = ({ checkedPlayers }) => {
       }
     }
     if (suggestions.length === 0) {
-      toast.error("No balanced matches found within ±10%");
+      toast.error(t("No balanced matches found within ±10%"));
     }
     return suggestions;
   };
@@ -291,9 +291,9 @@ const CourtPlayer = ({ checkedPlayers }) => {
       setMatches(prev => prev.map(m =>
         m.id === matchId ? { ...m, matchStatus: 'waiting', dashboardMatchId: doc.$id } : m
       ));
-      toast.success("Match is now WAITING — visible in Live Scores!");
+      toast.success(t("Match is now WAITING — visible in Live Scores!"));
     } catch {
-      toast.error("Failed to queue match");
+      toast.error(t("Failed to queue match"));
     }
   };
 
@@ -325,7 +325,7 @@ const CourtPlayer = ({ checkedPlayers }) => {
           : m
       ));
     } catch {
-      toast.error("Failed to start match");
+      toast.error(t("Failed to start match"));
     }
   };
 
@@ -360,7 +360,7 @@ const CourtPlayer = ({ checkedPlayers }) => {
         .catch(e => console.error("Error incrementing gamesPlayed:", e));
 
     } catch {
-      toast.error("Failed to end match");
+      toast.error(t("Failed to end match"));
     }
   };
 
@@ -546,7 +546,7 @@ const CourtPlayer = ({ checkedPlayers }) => {
                     <div className="flex justify-center items-center gap-2">
                       {/* Court Number */}
                       <div className="flex flex-row items-center gap-2 md:gap-3">
-                        <img src={tennisCourt} alt="Tennis Court" className="self-center w-6 h-6"/>
+                        <img src={tennisCourt} alt={t('Tennis Court')} className="self-center w-6 h-6"/>
                         <select
                           className="disabled:opacity-50 mt-1 px-2 py-1.5 border border-gray-300 rounded-lg text-[10px] disabled:cursor-not-allowed"
                           disabled={match.matchStatus === 'waiting' || match.matchStatus === 'playing'}
@@ -781,7 +781,7 @@ const CourtPlayer = ({ checkedPlayers }) => {
                       <button
                         onClick={() => {
                           handleUseSuggestedMatch(index);
-                          toast.success(`Match ${index + 1} added`);
+                          toast.success(`${t('Match added')} ${index + 1}`);
                         }}
                         className="bg-green-500 hover:bg-green-600 mt-2 py-1 rounded-lg w-full text-white text-sm"
                       >

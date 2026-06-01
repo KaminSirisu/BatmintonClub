@@ -12,10 +12,10 @@ export default function DragDropUpload({ onFileSelected, uploadedSlipUrl = null 
   useEffect(() => {
     if (uploadedSlipUrl && !filePreview) {
       setFilePreview(uploadedSlipUrl);
-      setFileName("Previously uploaded slip");
+      setFileName(t("Previously uploaded slip"));
       setFileSize(null); // You could display size if you fetch metadata
     }
-  }, [uploadedSlipUrl, filePreview]);
+  }, [uploadedSlipUrl, filePreview, t]);
 
   const onDrop = useCallback((acceptedFiles) => {
     const file = acceptedFiles[0];
@@ -45,7 +45,7 @@ export default function DragDropUpload({ onFileSelected, uploadedSlipUrl = null 
         <input {...getInputProps()} />
         <div className="space-y-2">
           <div className="font-medium text-gray-700">
-            {isDragActive ? "Drop the file here..." : t("Drop your file here or click to browse")}
+            {isDragActive ? t("Drop the file here...") : t("Drop your file here or click to browse")}
           </div>
           <button className="bg-blue-500 hover:bg-blue-600 px-4 py-1 rounded text-white text-sm">{t('Choose File')}</button>
 
@@ -53,7 +53,7 @@ export default function DragDropUpload({ onFileSelected, uploadedSlipUrl = null 
             <div className="pt-4">
               <img
                 src={filePreview}
-                alt="Preview"
+                alt={t('Preview')}
                 className="shadow mx-auto border rounded w-24 h-36 object-contain"
               />
               <div className="mt-2 text-gray-600 text-sm">

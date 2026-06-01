@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../utils/AuthContext';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useLanguage } from '../utils/LanguageProvider.jsx';
 
 const SignUp = () => {
   const [showPassword1, setShowPassword1] = useState(false);
@@ -12,13 +13,14 @@ const SignUp = () => {
   const registerForm = useRef(null);
   const { user, registerUser } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const rules = [
-    { label: "At least 8 characters", test: /.{8,}/ },
-    { label: "At least one lowercase letter", test: /[a-z]/ },
-    { label: "At least one uppercase letter", test: /[A-Z]/ },
-    { label: "At least one number", test: /\d/ },
-    { label: "At least one special character (!...$)", test: /[!@#$%^&*(),.?":{}|<>_-]/ }
+    { label: t("At least 8 characters"), test: /.{8,}/ },
+    { label: t("At least one lowercase letter"), test: /[a-z]/ },
+    { label: t("At least one uppercase letter"), test: /[A-Z]/ },
+    { label: t("At least one number"), test: /\d/ },
+    { label: t("At least one special character (!...$)"), test: /[!@#$%^&*(),.?":{}|<>_-]/ }
   ];
 
   const allRulesPass = rules.every(rule => rule.test.test(password));
@@ -33,18 +35,18 @@ const SignUp = () => {
     
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      toast.error("Please enter a valid email address.");
+      toast.error(t("Please enter a valid email address."));
       return;
     }
 
     if (!allRulesPass) {
-      toast.error('Password does not meet all requirements.');
+      toast.error(t('Password does not meet all requirements.'));
       return;
     }
 
 
     if (password1 !== password2) {
-      toast.error('Passwords do not match!');
+      toast.error(t('Passwords do not match!'));
       return
     }
 
@@ -53,7 +55,7 @@ const SignUp = () => {
       await registerUser(userInfo);
       // Optionally navigate here if not handled in registerUser
     } catch (error) {
-      alert('Registration failed. Please try again.');
+      alert(t('Registration failed. Please try again.'));
       console.error(error);
     }
   };
@@ -69,19 +71,19 @@ const SignUp = () => {
       <div className="bg-white shadow-md p-8 rounded-lg w-full max-w-md">
         <div className='flex justify-center'>
           <h1 className='mb-7 font-bold text-3xl'>
-            Batminton Club
+            {t('clubTitle')}
           </h1>
         </div>
         
-        <h2 className="mb-1 font-bold text-gray-800 text-2xl">Create an account</h2>
-        <p className="mb-6 text-gray-500 text-sm">Please fill in your details</p>
+        <h2 className="mb-1 font-bold text-gray-800 text-2xl">{t('Create an account')}</h2>
+        <p className="mb-6 text-gray-500 text-sm">{t('Please fill in your details')}</p>
 
         <form onSubmit={handleSubmit} ref={registerForm}>
 
           <input
             type="text"
             name="name"
-            placeholder="Name"           
+            placeholder={t('name')}
             className="mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
             required
           />
@@ -89,7 +91,7 @@ const SignUp = () => {
           <input
             type="email"
             name="email"
-            placeholder="Email address"                        
+            placeholder={t('Email address')}
             className="mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
             required
           />
@@ -98,7 +100,7 @@ const SignUp = () => {
             <input
               type={showPassword1 ? "text" : "password"}
               name="password1"
-              placeholder="Password"  
+              placeholder={t('Password')}
               onChange={(e) => setPassword(e.target.value)}          
               className="mb-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
               required
@@ -127,7 +129,7 @@ const SignUp = () => {
             <input
               type={showPassword2 ? "text" : "password"}
               name="password2"
-              placeholder="Confirm Password"
+              placeholder={t('Confirm Password')}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
@@ -151,7 +153,7 @@ const SignUp = () => {
                 : "bg-gray-400 cursor-not-allowed"}`
               }
           >
-            Sign up
+            {t('Sign up')}
           </button>
         </form>
 
@@ -164,9 +166,9 @@ const SignUp = () => {
         </button> */}
 
         <p className="text-sm text-center">
-          Already have an account?{' '}
+          {t('Already have an account?')}{' '}
           <Link to="/sign-in" className="text-blue-600 hover:underline">
-            Sign in
+            {t('Sign in')}
           </Link>
         </p>
       </div>

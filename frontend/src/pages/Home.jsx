@@ -19,9 +19,10 @@ const Home = () => {
           getPlayers, 
           updatedPlayers, 
           deletePlayer, 
-          createCheckIn,
+          createBooking,
           getCheckIn,
-          clearCheckIns,
+          getTodayBookings,
+          completePendingCheckIn,
           uploadSlipToAppwrite,
           
         }  = useAuth();
@@ -32,13 +33,16 @@ const Home = () => {
   const [showAddPlayerModal, setShowAddPlayerModal] = useState(false);
   const [showUpdatePlayerModal, setShowUpdatePlayerModal] = useState(false);
 
-  const [showCheckInPlayerModal, setShowCheckInPlayerModal] = useState(false);
-  const [checkInTime, setCheckInTime] = useState('');
-  const [checkedInClubs, setCheckedInClubs] = useState([]);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [bookingTime, setBookingTime] = useState('');
+  const [bookedClubs, setBookedClubs] = useState([]);
   const [selectedClub, setSelectedClub] = useState(null);
   const [checkIns, setCheckIns] = useState([]);
-  const [openTimes, setOpenTimes] = useState({});
-  const [isAdminCheckInModalOpen, setIsAdminCheckInModalOpen] = useState(false);
+  const [checkInClub, setCheckInClub] = useState(null);
+  const [pendingProfileDrafts, setPendingProfileDrafts] = useState({});
+  const [completingCheckInId, setCompletingCheckInId] = useState(null);
+  const [bookings, setBookings] = useState([]);
+  const [isBookingsModalOpen, setIsBookingsModalOpen] = useState(false);
 
 
   const [showUploadSlipModal, setShowUploadSlipModal] = useState(false);
@@ -170,69 +174,74 @@ const Home = () => {
     return slots;
   }
 
-  const handleCheckInClick = (clubData) => {
-    setSelectedClub(clubData);
-    setShowCheckInPlayerModal(true);
-  };
-
-  const handleCheckInSubmit = async (Name) => {
-    if (!selectedClub || !checkInTime) return;
+  const handleBookingSubmit = async (playerName) => {
+    if (!selectedClub || !bookingTime) return;
 
     try {
-      await createCheckIn({
-        name: Name,
+      await createBooking({
+        playerName,
         clubId: selectedClub.id,
-        checkInTime,
+        bookingTime,
       });
-      setShowCheckInPlayerModal(false);
-      setCheckedInClubs((prev) => [...prev, selectedClub.id]);
-      setCheckInTime("");
+      setShowBookingModal(false);
+      setBookedClubs((prev) => [...prev, selectedClub.id]);
+      setBookingTime("");
     } catch {
-      alert('Failed to check-in.');
+      alert(t('Failed to create booking.'));
     }
   };
 
-  const groupedCheckIns = checkIns.reduce((acc, item) => {
-    if (!acc[item.checkInTime]) acc[item.checkInTime] = [];
-    acc[item.checkInTime].push(item);
-    return acc;
-  }, {});
-
-  const sortedTimes = Object.keys(groupedCheckIns).sort((a, b) => {
-    const timeToMinutes = (timeStr) => {
-      const [h, m] = timeStr.split(':').map(Number);
-      return h * 60 + m;
-    };
-    return timeToMinutes(a) - timeToMinutes(b);
-  });
-
-  const toggleTimeGroup = (time) => {
-    setOpenTimes(prev => ({ ...prev, [time]: !prev[time] }));
-  };
-
-
-
-
-  const handleClearCheckIns = async () => {
-    const confirmed = window.confirm("Are you sure you want to clear all check-ins?");
-    if (confirmed) {
-      await clearCheckIns(selectedClub?.id);
-      setCheckIns([]);
-      toast.success("Clear Check-Ins successed")
-    } else {
-      return;
-    }
-
-    // Your logic to delete all check-ins
-  };
-
-
-  const handleOpenModal = async (club) => {
+  const handleOpenBookingsModal = async (club) => {
     setSelectedClub(club);
-    setIsAdminCheckInModalOpen(true);
+    setIsBookingsModalOpen(true);
 
-    const checkInData = await getCheckIn(club); // ✅ Make sure `club` is not undefined
+    const bookingData = await getTodayBookings(club.id);
+    setBookings(bookingData);
+  }
+
+
+  const handleLoadCheckIns = async (club) => {
+    setCheckInClub(club);
+    const checkInData = await getCheckIn(club);
     setCheckIns(checkInData);
+  };
+
+  const updatePendingProfileDraft = (checkInId, field, value) => {
+    setPendingProfileDrafts((previous) => ({
+      ...previous,
+      [checkInId]: {
+        revisedName: previous[checkInId]?.revisedName || '',
+        skillLevel: previous[checkInId]?.skillLevel || 'VB',
+        [field]: value,
+      },
+    }));
+  };
+
+  const handleCompletePendingCheckIn = async (checkIn) => {
+    const draft = pendingProfileDrafts[checkIn.$id] || {};
+
+    try {
+      setCompletingCheckInId(checkIn.$id);
+      const result = await completePendingCheckIn({
+        checkIn,
+        revisedName: draft.revisedName,
+        skillLevel: draft.skillLevel || 'VB',
+      });
+
+      setCheckIns((previous) =>
+        previous.map((item) => item.$id === checkIn.$id ? result.checkIn : item)
+      );
+      setPlayers(await getPlayers());
+      setPendingProfileDrafts((previous) => {
+        const next = { ...previous };
+        delete next[checkIn.$id];
+        return next;
+      });
+    } catch {
+      // AuthContext displays the Appwrite error.
+    } finally {
+      setCompletingCheckInId(null);
+    }
   };
 
   const handleOpenUploadSlipModal = async (clubData) => {
@@ -403,85 +412,209 @@ const Home = () => {
                         <span className="text-xs sm:text-sm">{getClubMemberCount(club.id)}</span>
                       </div>
                       <button
-                        onClick={() => handleOpenModal(club)}
-                        className="flex items-center gap-1 text-gray-400 hover:text-gray-600 text-[11px] sm:text-xs transition"
+                        onClick={() => handleOpenBookingsModal(club)}
+                        className="flex items-center gap-1 text-amber-600 hover:text-amber-700 text-[11px] sm:text-xs transition"
                       >
                         <CalendarClockIcon size={12} />
-                        <span>{t('checked-In')}</span>
+                        <span>{t("Today's bookings")}</span>
                       </button>
                     </div>
+                    <div className='flex justify-end'>
+                      <button
+                        onClick={() => handleLoadCheckIns(club)}
+                        className="flex items-center gap-1 text-gray-400 hover:text-gray-600 text-[11px] sm:text-xs transition"
+                      >
+                        <Users size={12} />
+                        <span>{t("Today's Check-ins")}</span>
+                      </button>
+                    </div>
+
                   </div>
                 );
               })}
             </div>
-
-            {isAdminCheckInModalOpen && (
-              <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/50 p-4">
-                <div className="relative bg-white shadow-xl p-6 rounded-2xl w-full max-w-md">
-                  {/* Modal Header */}
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="flex flex-col gap-2">
-                      <h3 className="font-bold text-gray-800 text-xl leading-none">
-                        {t('Check-In Players')}
-                      </h3>
-                      {checkIns.length > 0 && (
-                        <button
-                          onClick={handleClearCheckIns}
-                          className="inline-flex items-center bg-red-600 hover:bg-red-700 shadow-md px-2.5 py-[8px] rounded-lg w-max font-medium text-[12px] text-white transition"
-                          style={{ lineHeight: 1 }}
-                        >
-                          {t('Clear All')}
-                        </button>
-                      )}
+            
+            {/* Booking Modal */}
+            {isBookingsModalOpen && (
+              <div className='z-50 fixed inset-0 flex justify-center items-center bg-black/50 p-4'>
+                <div className='relative bg-white shadow-xl p-6 rounded-2xl w-full max-w-md'>
+                  <div className='flex justify-between items-center mb-3'>
+                    <div>
+                      <h3 className='font-bold text-gray-800 text-xl'>{t("Today's bookings")}</h3>
+                      <p className="mt-1 text-gray-500 text-sm">
+                        {selectedClub?.clubName}
+                      </p>
                     </div>
+
                     <button
-                      onClick={() => setIsAdminCheckInModalOpen(false)}
-                      className="text-gray-500 hover:text-gray-800 text-3xl transition"
+                      onClick={() => setIsBookingsModalOpen(false)}
+                      className='text-gray-500 hover:text-gray-800 text-3xl transition'
                     >
-                      ✕
+                      x
                     </button>
                   </div>
-                  {/* Divider */}
+
                   <hr className="mb-3" />
-                  {/* Check-in List */}
-                  {checkIns.length > 0 ? (
-                    <div className="max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
-                      {sortedTimes.map(time => (
-                        <div key={time} className="bg-white mb-2 border rounded-lg">
-                          <button
-                            className="flex justify-between px-4 py-2 border border-gray-200 rounded-lg w-full font-semibold"
-                            onClick={() => toggleTimeGroup(time)}
+
+                  {bookings.length > 0 ? (
+                    <div className='space-y-2 max-h-72 overflow-y-auto'>
+                      {bookings.map((booking) => (
+                        <div
+                          key={booking.$id}
+                          className='flex justify-between items-center gap-3 border border-gray-200 p-3 rounded-xl'
+                        >
+                          <div>
+                            <p className="font-semibold text-gray-800">
+                              {booking.playerName || booking.lineDisplayName || t('LINE User')}
+                            </p>
+                            <p className="mt-1 text-gray-500 text-xs">
+                              {t('Planned arrival')}: {booking.bookingTime}
+                            </p>
+                          </div>
+
+                          <span
+                            className={`px-2 py-1 rounded-full font-semibold text-xs ${
+                              booking.status === 'checked_in'
+                                ? 'bg-emerald-100 text-emerald-700'
+                                : 'bg-amber-100 text-amber-700'
+                            }`}
                           >
-                            <span>
-                              {time} / {t('Total')}: {groupedCheckIns[time].length} {t('players')}
-                            </span>
-                            <span
-                              className={`transform transition-transform duration-200 ${
-                                openTimes[time] ? 'rotate-90' : ''
-                              }`}
-                            >
-                              ▶
-                            </span>
-                          </button>
-                          {openTimes[time] && (
-                            <ul className="space-y-1 px-6 py-2">
-                              {groupedCheckIns[time].map(item => (
-                                <li key={item.$id} className="flex justify-between text-gray-700 text-sm">
-                                  <span>{item.name}</span>
-                                  <span className="font-semibold text-green-600">✓</span>
-                                </li>
-                              ))}
-                            </ul>
-                          )}
+                            {booking.status === 'checked_in' ? t('Checked in') : t('Booked')}
+                          </span>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="py-8 text-gray-500 text-center">{t('No check-ins yet for today')}</p>
+                    <p className="py-8 text-gray-500 text-center">
+                      {t('No bookings yet for today')}
+                    </p>
                   )}
                 </div>
               </div>
             )}
+
+            {/* Today's QR Check-ins */}
+            <section className="mb-6">
+              <div className="flex justify-between items-end gap-3 mb-3">
+                <div>
+                  <h2 className="font-bold text-base text-gray-800">{t("Today's Check-ins")}</h2>
+                  <p className="mt-0.5 text-gray-500 text-xs">
+                    {checkInClub
+                      ? `${checkInClub.clubName} · ${t('QR arrivals')}`
+                      : t("Choose Today's Check-ins on a club card to load arrivals.")}
+                  </p>
+                </div>
+                {checkInClub && (
+                  <button
+                    onClick={() => handleLoadCheckIns(checkInClub)}
+                    className="font-semibold text-blue-600 hover:text-blue-700 text-xs transition"
+                  >
+                    {t('Refresh')}
+                  </button>
+                )}
+              </div>
+
+              <div className="bg-white border border-gray-200 rounded-2xl overflow-x-auto shadow-sm">
+                {checkIns.length > 0 ? (
+                  <table className="w-full min-w-[760px] text-left text-sm">
+                    <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+                      <tr>
+                        <th className="px-4 sm:py-3 py-2">{t('time')}</th>
+                        <th className="px-4 sm:py-3 py-2">{t('LINE name')}</th>
+                        <th className="px-4 sm:py-3 py-2">{t('Player name')}</th>
+                        <th className="px-4 sm:py-3 py-2">{t('Skill')}</th>
+                        <th className="px-4 sm:py-3 py-2">{t('Status')}</th>
+                        <th className="px-4 sm:py-3 py-2">{t('Action')}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {checkIns.map((checkIn) => {
+                        const isPending = checkIn.status === 'pending_profile';
+                        const draft = pendingProfileDrafts[checkIn.$id] || {};
+
+                        return (
+                          <tr key={checkIn.$id} className="align-top">
+                            <td className="px-4 sm:py-3 py-2 font-semibold text-gray-700">
+                              {checkIn.checkInTime}
+                            </td>
+                            <td className="px-4 sm:py-3 py-2 text-gray-700">
+                              {checkIn.lineDisplayName || checkIn.name}
+                            </td>
+                            <td className="px-4 sm:py-3 py-2">
+                              {isPending ? (
+                                <input
+                                  type="text"
+                                  value={draft.revisedName || ''}
+                                  onChange={(event) =>
+                                    updatePendingProfileDraft(checkIn.$id, 'revisedName', event.target.value)
+                                  }
+                                  placeholder={t('enter player name')}
+                                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full min-w-40"
+                                />
+                              ) : (
+                                <span className="font-semibold text-gray-800">{checkIn.name}</span>
+                              )}
+                            </td>
+                            <td className="px-4 sm:py-3 py-2">
+                              {isPending ? (
+                                <select
+                                  value={draft.skillLevel || 'VB'}
+                                  onChange={(event) =>
+                                    updatePendingProfileDraft(checkIn.$id, 'skillLevel', event.target.value)
+                                  }
+                                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                  <option value="VB">VB</option>
+                                  <option value="BG">BG</option>
+                                  <option value="N-">N-</option>
+                                  <option value="N">N</option>
+                                  <option value="S">S</option>
+                                  <option value="P">P</option>
+                                </select>
+                              ) : (
+                                <span className="font-semibold text-gray-700">
+                                  {checkIn.skillLevel || '-'}
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 sm:py-3 py-2">
+                              <span
+                                className={`inline-flex px-2 py-1 rounded-full font-semibold text-xs ${
+                                  isPending
+                                    ? 'bg-amber-100 text-amber-700'
+                                    : 'bg-emerald-100 text-emerald-700'
+                                }`}
+                              >
+                                {isPending ? t('Setup needed') : t('Ready')}
+                              </span>
+                            </td>
+                            <td className="px-4 sm:py-3 py-2">
+                              {isPending ? (
+                                <button
+                                  onClick={() => handleCompletePendingCheckIn(checkIn)}
+                                  disabled={completingCheckInId === checkIn.$id}
+                                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 px-3 py-2 rounded-lg font-semibold text-white text-xs transition"
+                                >
+                                  {completingCheckInId === checkIn.$id ? t('Saving...') : t('addPlayer')}
+                                </button>
+                              ) : (
+                                <span className="text-gray-400 text-xs">{t('Linked player')}</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p className="px-4 py-8 text-gray-500 text-center text-sm">
+                    {checkInClub
+                      ? t('No check-ins yet for today')
+                      : t('No club selected')}
+                  </p>
+                )}
+              </div>
+            </section>
 
             {/* Player Section Header */}
             <div className="flex justify-between items-center mb-3">
@@ -678,7 +811,7 @@ const Home = () => {
                         className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
                         value={editingPlayer.name}
                         onChange={(e) => setEditingPlayer({...editingPlayer, name: e.target.value})}
-                        placeholder="Enter player name"
+                        placeholder={t('enter player name')}
                       />
                     </div>
                     <div>
@@ -740,19 +873,19 @@ const Home = () => {
                         <p className="text-gray-500 text-xs sm:text-sm mt-0.5">
                           {club.playingDay.split(',').map(day => t(day.trim())).join(', ')}
                         </p>
-                        <p className="text-gray-500 text-xs sm:text-sm">{club.startTime}–{club.endTime}</p>
+                        <p className="text-gray-500 text-xs sm:text-sm">{club.startTime}-{club.endTime}</p>
                       </div>
                       {/* Right: Buttons stacked */}
                       <div className="flex flex-col items-end gap-1.5 sm:gap-2 flex-shrink-0">
-                        {checkedInClubs.includes(club.id) ? (
-                          <span className="font-semibold text-green-600 text-xs sm:text-sm">✅ {t('Checked In')}</span>
+                        {bookedClubs.includes(club.id) ? (
+                          <span className="font-semibold text-green-600 text-xs sm:text-sm">✓ Booked</span>
                         ) : (
                           <button
-                            onClick={() => { setSelectedClub(club); setShowCheckInPlayerModal(true); }}
+                            onClick={() => { setSelectedClub(club); setShowBookingModal(true); }}
                             className={`${colorss} px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl font-semibold text-white text-xs sm:text-sm shadow-sm flex items-center gap-1 hover:opacity-90 transition`}
                           >
                             <CalendarClockIcon size={13} />
-                            {t('check-In')}
+                            {t('Booking')}
                           </button>
                         )}
                         <button
@@ -774,15 +907,18 @@ const Home = () => {
               })}
             </div>
 
-            {/* Check-in Player Modal */}
-            {showCheckInPlayerModal && selectedClub && (
+            {/* Booking Modal */}
+            {showBookingModal && selectedClub && (
               <div className="z-50 fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 p-4">
                 <div className="bg-white p-6 rounded-lg w-full max-w-md">
-                  <h3 className="mb-4 font-semibold text-lg">{t('check-In')}</h3>
+                  <h3 className="mb-1 font-semibold text-lg">{t('Booking')}</h3>
+                  <p className="mb-4 text-gray-500 text-sm">
+                    {t('Choose the time you plan to arrive at')} {selectedClub.clubName}.
+                  </p>
                   <select
                     className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-                    value={checkInTime}
-                    onChange={(e) => setCheckInTime(e.target.value)}
+                    value={bookingTime}
+                    onChange={(e) => setBookingTime(e.target.value)}
                   >
                     <option value="">{t('Select time')}</option>
                     {generateTimeSlots(selectedClub.startTime).map((time, index) => (
@@ -793,13 +929,16 @@ const Home = () => {
                   </select>
                   <div className="flex justify-end gap-3 mt-6">
                     <button
-                      onClick={() => handleCheckInClick(!club)}
+                      onClick={() => {
+                        setShowBookingModal(false);
+                        setBookingTime("");
+                      }}
                       className="px-4 py-2 text-gray-600 hover:text-gray-800"
                     >
                       {t('cancel')}
                     </button>
                     <button
-                      onClick={() => handleCheckInSubmit(name)}
+                      onClick={() => handleBookingSubmit(name)}
                       className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-white transition-colors"
                     >
                       {t('save')}
@@ -825,7 +964,7 @@ const Home = () => {
                         <div className="mb-4 flex justify-center">
                           <img 
                             src={uploadingSlipClub.paymentQrDisplayUrl || uploadingSlipClub.paymentQrDownloadUrl || uploadingSlipClub.paymentQrPreviewUrl} 
-                            alt="Payment QR Code" 
+                            alt={t('Payment QR Code')}
                             className="w-40 h-40 border-2 border-blue-300 rounded"
                           />
                         </div>

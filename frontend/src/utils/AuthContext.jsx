@@ -18,18 +18,21 @@ import {
   CLUBS_COLLECTION_ID,
   USERS_COLLECTION_ID,
   CHECKIN_COLLECTION_ID,
+  BOOKINGS_COLLECTION_ID,
   MATCHES_COLLECTION_ID,
   SLIP_STORAGE_ID,
   MONEYSLIP_COLLECTION_ID
 } from "../Appwrite";
 import { toast } from 'react-hot-toast';
 import { ID, Query } from "appwrite";
+import { useLanguage } from "./LanguageProvider.jsx";
 
 // Create context
 const AuthContext = createContext();
 
 // AuthProvider component
 export const AuthProvider = ({ children }) => {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -71,7 +74,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(accountDetails));
       navigate("/");
     } catch (e) {
-      toast.error("Please check the email or password.");
+      toast.error(t("Please check the email or password."));
       console.error("Login error:", e);
     }
     setLoading(false);
@@ -103,7 +106,7 @@ export const AuthProvider = ({ children }) => {
       const accountDetails = await account.get();
       setUser(accountDetails);
       // localStorage.setItem("user", JSON.stringify(accountDetails));
-      toast.success("SignUp successfully!")
+      toast.success(t("SignUp successfully!"))
       navigate("/");
     } catch (e) {
       
@@ -204,10 +207,10 @@ export const AuthProvider = ({ children }) => {
       }));
     } catch (e) {
       console.error("Failed to fetch payment QR files:", e);
-      toast.error("Failed to load payment QR files.");
+      toast.error(t("Failed to load payment QR files."));
       return [];
     }
-  }, [getPaymentQrUrls]);
+  }, [getPaymentQrUrls, t]);
 
   const createClubs = async (userInfo) => {
     setLoading(true);
@@ -236,10 +239,10 @@ export const AuthProvider = ({ children }) => {
         }
       );
       clubsCacheRef.current = null;
-      toast.success("Create Club Successfully!");
+      toast.success(t("Create Club Successfully!"));
     } catch (e) {
         console.error("Error creating club:", e);
-        toast.error("Failed to create club. Please try again.");
+        toast.error(t("Failed to create club. Please try again."));
     } finally {
         setLoading(false);
     }
@@ -322,7 +325,7 @@ export const AuthProvider = ({ children }) => {
         payload
       );
       clubsCacheRef.current = null;
-      toast.success("Club updated successfully!");
+      toast.success(t("Club updated successfully!"));
       return await getClubById(clubId);
     } catch (e) {
       console.error("Error updating club:", e);
@@ -341,10 +344,10 @@ export const AuthProvider = ({ children }) => {
         clubId
       );
       clubsCacheRef.current = null;
-      toast.success("Club deleted successfully!");
+      toast.success(t("Club deleted successfully!"));
     } catch (e) {
       console.error("Error deleting club:", e);
-      toast.error("Failed to delete club. Please try again.");
+      toast.error(t("Failed to delete club. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -363,11 +366,11 @@ export const AuthProvider = ({ children }) => {
           club: playerData.clubs,
         }
       );
-      toast.success("Player added successfully!");
+      toast.success(t("Player added successfully!"));
       return res;
     } catch (e) {
       console.error("Error adding player:", e);
-      toast.error("Failed to add player. Please try again.");
+      toast.error(t("Failed to add player. Please try again."));
       return null;
     } finally {
       setLoading(false);
@@ -435,37 +438,74 @@ export const AuthProvider = ({ children }) => {
         PLAYERS_COLLECTION_ID,
         playerId
       );
-      toast.success("Player deleted successfully!");
+      toast.success(t("Player deleted successfully!"));
       if (onSuccess) onSuccess();
     } catch (e) {
       console.error("Error deleting player:", e);
-      toast.error("Failed to delete player. Please try again.");
+      toast.error(t("Failed to delete player. Please try again."));
     } finally {
       setLoading(false);
     }
   };
 
-  const createCheckIn = async ({ name, clubId, checkInTime }) => {
+  const getBangkokToday = () => {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Bangkok",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+  }
+
+  // Booking Feature
+  const createBooking = async ({ playerName, clubId, bookingTime }) => {
     try {
       const response = await databases.createDocument(
-        DATABASE_ID,     
-        CHECKIN_COLLECTION_ID, 
-        ID.unique(),            // Auto-generated ID
+        DATABASE_ID,
+        BOOKINGS_COLLECTION_ID,
+        ID.unique(),
         {
-          name,     // Assumes you have user object
+          playerName,
           clubId,
-          checkInTime,
-          createAt: new Date().toISOString(), // Or let Appwrite handle this if set as default
+          bookingTime,
+          bookingDate: getBangkokToday(),
+          status: "booked",
         }
       );
-      toast.success("Check-In successfully!")
+
+      toast.success(t("Booking successful!"));
       return response;
-    } catch (err) {
-      console.error('Failed to create check-in:', err);
-      throw err;
+    } catch (error) {
+      console.error("Failed to create booking:", error);
+      throw error;
     }
   };
 
+  const getTodayBookings = async (clubId) => {
+    try {
+      if (!clubId) {
+        throw new Error('clubId is required to fetch bookings');
+      }
+
+      const response = await databases.listDocuments(
+        DATABASE_ID,
+        BOOKINGS_COLLECTION_ID,
+        [
+          Query.equal('clubId', clubId),
+          Query.equal("bookingDate", getBangkokToday()),
+        ]
+      )
+
+      return response.documents.sort((a,b) => 
+        a.bookingTime.localeCompare(b.bookingTime)
+      );
+    } catch (error) {
+      console.error("Failed to fetch bookings:", error);
+      return [];
+    }
+  }
+
+  // Check-in Feature
   const getCheckIn = async (club) => {
     try {
       const response = await databases.listDocuments(
@@ -473,6 +513,7 @@ export const AuthProvider = ({ children }) => {
         CHECKIN_COLLECTION_ID,
         [
           Query.equal("clubId", club.id),
+          Query.equal("checkInDate", getBangkokToday()),
         ]
       );
       // Sort earliest to latest by checkInTime (e.g., 20:00 → 20:30 → 21:00)
@@ -483,41 +524,57 @@ export const AuthProvider = ({ children }) => {
       return sorted;
     } catch (e) {
       console.error("Failed to fetch check-ins:", e);
+      return [];
     }
   }
 
-  const clearCheckIns = async (clubId) => {
-    try {
-      if (!clubId) {
-        throw new Error("clubId is required to clear check-ins");
-      }
+  const completePendingCheckIn = async ({ checkIn, revisedName, skillLevel }) => {
+    const cleanName = String(revisedName || "").trim();
 
-      const response = await databases.listDocuments(
+    if (!checkIn?.$id) throw new Error("checkIn is required");
+    if (!checkIn.lineUserId) throw new Error("Check-in is missing lineUserId");
+    if (!cleanName) throw new Error("Revised name is required");
+    if (!skillLevel) throw new Error("Skill level is required");
+
+    try {
+      const player = await databases.createDocument(
+        DATABASE_ID,
+        PLAYERS_COLLECTION_ID,
+        ID.unique(),
+        {
+          name: cleanName,
+          skillLevel,
+          club: [checkIn.clubId],
+          lineUserId: checkIn.lineUserId,
+          lineDisplayName: checkIn.lineDisplayName || checkIn.name,
+        }
+      );
+
+      const updatedCheckIn = await databases.updateDocument(
         DATABASE_ID,
         CHECKIN_COLLECTION_ID,
-        [
-          Query.equal("clubId", clubId),
-        ]
+        checkIn.$id,
+        {
+          name: cleanName,
+          revisedName: cleanName,
+          skillLevel,
+          playerId: player.$id,
+          status: "ready_for_matchmaking",
+        }
       );
 
-      if (response.documents.length === 0) {
-        console.log("No check-ins to delete.");
-        return;
-      }
+      toast.success(t("New player profile completed!"));
 
-      // Delete all documents concurrently
-      await Promise.all(
-        response.documents.map(doc =>
-          databases.deleteDocument(DATABASE_ID, CHECKIN_COLLECTION_ID, doc.$id)
-        )
-      );
-
-      console.log(`Deleted ${response.documents.length} check-ins for club ${clubId}.`);
+      return {
+        player,
+        checkIn: updatedCheckIn,
+      };
     } catch (error) {
-      console.error("Failed to clear check-ins:", error);
+      console.error("Failed to complete pending check-in:", error);
+      toast.error(error?.message || "Failed to complete player profile.");
+      throw error;
     }
-  }
-
+  };
 
   const createMatch = async ({players, court}) => {
     try {
@@ -531,7 +588,7 @@ export const AuthProvider = ({ children }) => {
           startTime: new Date().toISOString(),
         }
       )
-      toast.success("Match End");
+      toast.success(t("Match End"));
     } catch (e) {
       console.error("Failed to create match:", e);
       throw e;
@@ -964,11 +1021,11 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const updatedUser = await account.updateName(newName);
-      toast.success("Name updated:", updatedUser);
+      toast.success(t("Name updated"), updatedUser);
       console.log("Name updated:", updatedUser);
       return updatedUser;
     } catch (error) {
-      toast.error("Failed to update name")
+      toast.error(t("Failed to update name"))
       console.error("Failed to update name:", error);
       throw error;
     }
@@ -998,8 +1055,9 @@ export const AuthProvider = ({ children }) => {
     getPlayers,
     updatedPlayers,
     deletePlayer,
-    createCheckIn,
-    clearCheckIns,
+    createBooking,
+    getTodayBookings,
+    completePendingCheckIn,
     createMatch,
     getMatches,
     getMatchesByClubId,
@@ -1026,7 +1084,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={contextData}>
       {initialLoading ? (
         <div className="flex justify-center items-center bg-blue-50 w-screen h-screen">
-          <p className="font-semibold text-blue-700 text-lg">Loading...</p>
+          <p className="font-semibold text-blue-700 text-lg">{t('Loading...')}</p>
         </div>
       ) : (
         children

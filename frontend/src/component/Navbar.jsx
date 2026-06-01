@@ -83,7 +83,7 @@ const Navbar = () => {
           <p className="font-semibold text-[14px] text-black md:text-[22px]">
             {t('clubTitle')}
           </p>
-          <img src={Badminton} alt="Badminton" className="self-center w-6 h-6" />
+          <img src={Badminton} alt={t('clubTitle')} className="self-center w-6 h-6" />
         </Link>
 
         {/* Desktop Right */}

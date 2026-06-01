@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { useParams } from 'react-router-dom';
 import Navbar from '../component/Navbar.jsx';
 import BottomNav from '../component/BottomNav.jsx';
 import DashboardMatchesTable from '../component/DashboardMatchesTable.jsx';
@@ -15,24 +14,18 @@ const statusDisplayOrder = {
 
 const Dashboard = () => {
   const { t, language } = useLanguage();
-  const navigate = useNavigate();
-
   const { id: urlClubId } = useParams();
   const {
     getClubData,
     getDashboardMatchesByClubId,
     subscribeToDashboardMatches,
-    getUserName,
   } = useAuth();
 
   const [matches, setMatches] = useState([]);
   const [clubs, setClubs] = useState([]);
   const [activeClubId, setActiveClubId] = useState(urlClubId || null);
-  const [notifiedMatches, setNotifiedMatches] = useState(new Set());
   const [isLoadingMatches, setIsLoadingMatches] = useState(false);
   const matchesCacheRef = useRef({});
-
-  const userName = getUserName();
 
   useEffect(() => {
     if (urlClubId) {
@@ -113,9 +106,6 @@ const Dashboard = () => {
     };
   }, [activeClubId, getDashboardMatchesByClubId, subscribeToDashboardMatches]);
 
-  const activeClub = clubs.find((club) => club.id === activeClubId) || null;
-  const clubName = activeClub?.clubName || t('clubTitle');
-
   const dashboardDate = useMemo(() => {
     const locale = language === 'th' ? 'th-TH' : 'en-US';
     return new Intl.DateTimeFormat(locale, {
@@ -148,15 +138,6 @@ const Dashboard = () => {
       { playing: 0, waiting: 0, finished: 0, total: 0 }
     );
   }, [sortedMatches]);
-
-  const toggleNotify = (matchId) => {
-    setNotifiedMatches((prev) => {
-      const next = new Set(prev);
-      if (next.has(matchId)) next.delete(matchId);
-      else next.add(matchId);
-      return next;
-    });
-  };
 
   return (
     <div className="flex flex-col bg-gray-50 min-h-screen">
@@ -214,7 +195,7 @@ const Dashboard = () => {
         {/* Loading indicator */}
         {isLoadingMatches && (
           <div className="mx-4 mb-3 bg-sky-50 border border-sky-100 rounded-xl px-4 py-2 text-sky-600 text-sm">
-            Refreshing matches...
+            {t('Refreshing matches...')}
           </div>
         )}
 
@@ -222,8 +203,6 @@ const Dashboard = () => {
         <div className="px-4">
           <DashboardMatchesTable
             matches={sortedMatches}
-            notifiedMatches={notifiedMatches}
-            onToggleNotify={toggleNotify}
           />
         </div>
       </div>

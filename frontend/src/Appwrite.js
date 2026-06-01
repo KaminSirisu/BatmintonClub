@@ -9,6 +9,7 @@ export const CHECKIN_COLLECTION_ID = import.meta.env.VITE_APPWRITE_CHECKIN_COLLE
 export const MATCHES_COLLECTION_ID = import.meta.env.VITE_APPWRITE_MATCHES_COLLECTION_ID;
 export const SLIP_STORAGE_ID = import.meta.env.VITE_APPWRITE_SLIP_STORAGE_ID;
 export const MONEYSLIP_COLLECTION_ID = import.meta.env.VITE_APPWRITE_MONEYSLIP_COLLECTION_ID;
+export const BOOKINGS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_BOOKINGS_COLLECTION_ID;
 
 import { Client, Account, Databases, Storage} from 'appwrite';
 

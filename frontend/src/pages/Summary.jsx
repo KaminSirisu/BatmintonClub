@@ -236,14 +236,14 @@ const Summary = ({ checkedPlayers, onCheckboxToggle }) => {
       <div className='flex justify-center mb-6'>
         <button
           onClick={async () => {
-            const confirmClear = window.confirm("Are you sure you want to clear all matches?");
+            const confirmClear = window.confirm(t("Are you sure you want to clear all matches?"));
             if (!confirmClear) return;
 
             // Instant UI update
             setPlayers(prev =>
               prev.map(player => ({ ...player, gamesPlayed: 0 }))
             );
-            toast.loading("Clearing matches...");
+            toast.loading(t("Clearing matches..."));
 
             // Then background deletion
             const result = await clearMatchesAndResetPlayers();
@@ -254,10 +254,10 @@ const Summary = ({ checkedPlayers, onCheckboxToggle }) => {
               setPlayers(prev =>
                 prev.map(player => ({ ...player, gamesPlayed: 0 }))
               );
-              toast.success("Matches cleared.");
+              toast.success(t("Matches cleared."));
               // optionally refresh data or UI
             } else {
-              toast.error("Something went wrong.");
+              toast.error(t("Something went wrong."));
             }
           }}
           className="mt-3 rounded-xl font-semibold text-red-500 hover:text-red-700 md:text-base transition"

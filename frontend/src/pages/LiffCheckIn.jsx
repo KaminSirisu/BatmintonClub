@@ -9,11 +9,13 @@ import {
     ShieldCheck,
     UserRound,
 } from 'lucide-react';
+import { useLanguage } from '../utils/LanguageProvider.jsx';
 
 const LIFF_ID = import.meta.env.VITE_LIFF_ID;
 const API_URL = import.meta.env.VITE_API_URL;
 
 function LiffCheckIn() {
+    const { t } = useLanguage();
     const [clubId] = useState(
         () => new URLSearchParams(window.location.search).get('clubId')
     );
@@ -99,7 +101,7 @@ function LiffCheckIn() {
                 <section className="text-center">
                     <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-emerald-100 border-t-emerald-600" />
                     <p className="mt-5 text-sm font-medium text-slate-600">
-                        Loading your LINE profile...
+                        {t('Loading your LINE profile...')}
                     </p>
                 </section>
             </main>
@@ -114,11 +116,11 @@ function LiffCheckIn() {
                         <AlertCircle size={28} />
                     </div>
                     <h1 className="mt-5 text-xl font-bold text-slate-900">
-                        Unable to open check-in
+                        {t('Unable to open check-in')}
                     </h1>
                     <p className="mt-3 text-sm leading-6 text-slate-600">{error}</p>
                     <p className="mt-5 text-xs leading-5 text-slate-400">
-                        Please scan the club QR code again or ask an admin for help.
+                        {t('Please scan the club QR code again or ask an admin for help.')}
                     </p>
                 </section>
             </main>
@@ -135,23 +137,23 @@ function LiffCheckIn() {
                         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/20">
                             <CheckCircle2 size={38} strokeWidth={2.5} />
                         </div>
-                        <h1 className="mt-4 text-2xl font-bold">Check-in successful</h1>
+                        <h1 className="mt-4 text-2xl font-bold">{t('Check-in successful')}</h1>
                         <p className="mt-2 text-sm text-emerald-50">
-                            Your arrival has been recorded.
+                            {t('Your arrival has been recorded.')}
                         </p>
                     </div>
 
                     <div className="p-6">
                         <div className="rounded-2xl bg-slate-50 p-4">
                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                                Player
+                                {t('player')}
                             </p>
                             <p className="mt-1 text-lg font-bold text-slate-900">
                                 {result.checkIn.name}
                             </p>
                             {result.checkIn.skillLevel && (
                                 <p className="mt-1 text-sm text-slate-600">
-                                    Skill level: {result.checkIn.skillLevel}
+                                    {t('skill level')}: {result.checkIn.skillLevel}
                                 </p>
                             )}
                         </div>
@@ -169,14 +171,14 @@ function LiffCheckIn() {
                                 <div>
                                     <p className="font-semibold">
                                         {isPendingProfile
-                                            ? 'Waiting for admin setup'
-                                            : 'Ready for matchmaking'
+                                            ? t('Waiting for admin setup')
+                                            : t('Ready for matchmaking')
                                         }
                                     </p>
                                     <p className="mt-1 text-sm leading-5 opacity-80">
                                         {isPendingProfile
-                                            ? 'An admin will assign your player name and skill level.'
-                                            : 'You are now in today\'s player queue.'
+                                            ? t('An admin will assign your player name and skill level.')
+                                            : t("You are now in today's player queue.")
                                         }
                                     </p>
                                 </div>
@@ -185,7 +187,7 @@ function LiffCheckIn() {
 
                         {result.duplicate && (
                             <p className="mt-4 text-center text-xs text-slate-500">
-                                You were already checked in today. No duplicate was created.
+                                {t('You were already checked in today. No duplicate was created.')}
                             </p>
                         )}
                     </div>
@@ -202,20 +204,20 @@ function LiffCheckIn() {
                         <MapPin size={28} />
                     </div>
                     <p className="mt-5 text-xs font-bold uppercase tracking-[0.2em] text-emerald-700">
-                        Badminton Club
+                        {t('clubTitle')}
                     </p>
                     <h1 className="mt-2 text-3xl font-bold tracking-tight">
-                        Confirm your arrival
+                        {t('Confirm your arrival')}
                     </h1>
                     <p className="mt-3 text-sm leading-6 text-slate-600">
-                        Please check the details below before joining today's player queue.
+                        {t("Please check the details below before joining today's player queue.")}
                     </p>
                 </header>
 
                 <div className="mt-7 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
                     <div className="border-b border-slate-100 p-5">
                         <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                            LINE profile
+                            {t('LINE profile')}
                         </p>
                         <div className="mt-3 flex items-center gap-3">
                             {profile.pictureUrl ? (
@@ -232,7 +234,7 @@ function LiffCheckIn() {
                             <div>
                                 <p className="font-bold text-slate-900">{profile.displayName}</p>
                                 <p className="mt-0.5 text-xs text-slate-500">
-                                    Signed in with LINE
+                                    {t('Signed in with LINE')}
                                 </p>
                             </div>
                         </div>
@@ -240,7 +242,7 @@ function LiffCheckIn() {
 
                     <div className="p-5">
                         <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                            Check-in location
+                            {t('Check-in location')}
                         </p>
                         <div className="mt-3 flex gap-3">
                             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
@@ -248,10 +250,10 @@ function LiffCheckIn() {
                             </div>
                             <div>
                                 <p className="font-semibold text-slate-900">
-                                    Club check-in desk
+                                    {t('Club check-in desk')}
                                 </p>
                                 <p className="mt-1 break-all text-xs leading-5 text-slate-500">
-                                    Club ID: {clubId}
+                                    {t('Club ID')}: {clubId}
                                 </p>
                             </div>
                         </div>
@@ -274,19 +276,19 @@ function LiffCheckIn() {
                     {isSubmitting ? (
                         <>
                             <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                            Checking you in...
+                            {t('Checking you in...')}
                         </>
                     ) : (
                         <>
                             <CheckCircle2 size={21} />
-                            Confirm Check-in
+                            {t('Confirm Check-in')}
                         </>
                     )}
                 </button>
 
                 <div className="mt-5 flex items-center justify-center gap-2 text-center text-xs leading-5 text-slate-500">
                     <ShieldCheck className="shrink-0 text-emerald-600" size={16} />
-                    Check-in happens only after you tap confirm.
+                    {t('Check-in happens only after you tap confirm.')}
                 </div>
             </section>
         </main>

@@ -49,7 +49,7 @@ const PreviewFilesList = ({ previewFiles }) => {
             </button>
             <img
               src={selectedFile.previewUrl}
-              alt="Slip"
+              alt={t('Slip')}
               className="shadow-lg rounded max-w-[90vw] max-h-[90vh]"
             />
           </div>

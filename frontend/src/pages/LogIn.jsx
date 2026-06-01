@@ -2,11 +2,13 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../utils/AuthContext';
 import { Eye, EyeOff } from 'lucide-react';
+import { useLanguage } from '../utils/LanguageProvider.jsx';
 
 const LogIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { user, loginUser } = useAuth();
+  const { t } = useLanguage();
 
   const loginForm = useRef(null);
 
@@ -24,7 +26,7 @@ const LogIn = () => {
     try {
       await loginUser({email, password});
     } catch {
-      alert('Login failed. Please check your credentials.');
+      alert(t('Please check the email or password.'));
     }
   }
 
@@ -32,11 +34,11 @@ const LogIn = () => {
     <div className="flex justify-center items-center bg-gray-50 px-4 min-h-screen">
       <div className="bg-white shadow-md p-8 rounded-lg w-full max-w-md">
         <div className='flex justify-self-center'>
-          <h2 className="mb-7 font-bold text-gray-800 text-3xl">Batminton Club</h2>
+          <h2 className="mb-7 font-bold text-gray-800 text-3xl">{t('clubTitle')}</h2>
         </div>
 
-        <h2 className="mb-1 font-bold text-gray-800 text-3xl">Welcome</h2>
-        <p className="mb-6 text-gray-500 text-md">Please enter your details</p>
+        <h2 className="mb-1 font-bold text-gray-800 text-3xl">{t('welcome')}</h2>
+        <p className="mb-6 text-gray-500 text-md">{t('Please enter your details')}</p>
 
         <form
           onSubmit={handleSubmit}
@@ -45,7 +47,7 @@ const LogIn = () => {
           <input
             type="email"
             name="email"
-            placeholder="Email address"
+            placeholder={t('Email address')}
             className="mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
             required
           />
@@ -54,7 +56,7 @@ const LogIn = () => {
             <input
               type={showPassword ? "text" : "password"}
               name="password"
-              placeholder="Password"
+              placeholder={t('Password')}
               className="mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
               required
             />
@@ -82,7 +84,7 @@ const LogIn = () => {
             type="submit"
             className="bg-blue-600 hover:bg-blue-700 mb-4 py-2 rounded-md w-full text-white"
           >
-            Sign in
+            {t('Sign in')}
           </button>
         </form>
 
@@ -95,9 +97,9 @@ const LogIn = () => {
         </button> */}
 
         <p className="text-sm text-center">
-          Don't have an account?{" "}
+          {t("Don't have an account?")}{" "}
           <Link to="/sign-up" className="text-blue-600 hover:underline">
-            Sign up
+            {t('Sign up')}
           </Link>
         </p>
       </div>

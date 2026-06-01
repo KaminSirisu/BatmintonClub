@@ -35,7 +35,7 @@ const getStatusStyle = (status) => {
   };
 };
 
-const MatchRow = ({ match, isNotified, onToggleNotify }) => {
+const MatchRow = ({ match }) => {
   const { t } = useLanguage();
   const sets = parseSetScores(match.matchScore);
   const lastSet = getLastSetPoints(sets);
@@ -87,14 +87,14 @@ const MatchRow = ({ match, isNotified, onToggleNotify }) => {
           <div className="text-[9px] text-gray-400 uppercase tracking-wide mb-0.5">
             {t('TEAM A')}
           </div>
-          <div className="text-[8px] sm:text-[10px] font-bold text-gray-900 leading-snug truncate">
+          <div className="text-[10px] sm:text-xs font-bold text-gray-900 leading-snug truncate">
             {teamALabel}
           </div>
         </div>
 
         {/* Center: time + score */}
         <div className="flex flex-col items-center flex-shrink-0 w-[54px]">
-          <div className="text-[10px] sm:text-[15px] font-black text-gray-900 leading-none">
+          <div className="text-[12px] sm:text-[15px] font-black text-gray-900 leading-none">
             {isWaiting ? 'VS' : `${match.totalTime ?? '-'}'`}
           </div>
           {!isWaiting && lastSet && (
@@ -109,7 +109,7 @@ const MatchRow = ({ match, isNotified, onToggleNotify }) => {
           <div className="text-[9px] text-gray-400 uppercase tracking-wide mb-0.5">
             {t('TEAM B')}
           </div>
-          <div className="text-[8px] sm:text-[10px] font-bold text-gray-900 leading-snug truncate">
+          <div className="text-[10px] sm:text-xs font-bold text-gray-900 leading-snug truncate">
             {teamBLabel}
           </div>
         </div>
@@ -118,7 +118,7 @@ const MatchRow = ({ match, isNotified, onToggleNotify }) => {
   );
 };
 
-const DashboardMatchesTable = ({ matches, notifiedMatches, onToggleNotify }) => {
+const DashboardMatchesTable = ({ matches }) => {
   const { t } = useLanguage();
 
   if (matches.length === 0) {
@@ -135,8 +135,6 @@ const DashboardMatchesTable = ({ matches, notifiedMatches, onToggleNotify }) => 
         <MatchRow
           key={match.id}
           match={match}
-          isNotified={notifiedMatches.has(match.id)}
-          onToggleNotify={() => onToggleNotify(match.id)}
         />
       ))}
     </div>
