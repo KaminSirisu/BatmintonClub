@@ -34,7 +34,9 @@ const LogIn = () => {
     <div className="flex justify-center items-center bg-gray-50 px-4 min-h-screen">
       <div className="bg-white shadow-md p-8 rounded-lg w-full max-w-md">
         <div className='flex justify-self-center'>
-          <h2 className="mb-7 font-bold text-gray-800 text-3xl">{t('clubTitle')}</h2>
+          <h2 className="mb-7 font-bold text-gray-800 text-3xl">
+            {/* {t('clubTitle')} */}KuanMatch
+          </h2>
         </div>
 
         <h2 className="mb-1 font-bold text-gray-800 text-3xl">{t('welcome')}</h2>

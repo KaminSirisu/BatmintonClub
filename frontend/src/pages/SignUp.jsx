@@ -71,7 +71,7 @@ const SignUp = () => {
       <div className="bg-white shadow-md p-8 rounded-lg w-full max-w-md">
         <div className='flex justify-center'>
           <h1 className='mb-7 font-bold text-3xl'>
-            {t('clubTitle')}
+            {/* {t('clubTitle')} */}KuanMatch
           </h1>
         </div>
         

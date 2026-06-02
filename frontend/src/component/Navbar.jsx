@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { LogOut, Menu } from "lucide-react";
+import { createPortal } from 'react-dom';
+import { LogOut, Menu, X } from "lucide-react";
 import { useAuth } from '../utils/AuthContext.jsx';
 import { Link, useLocation } from "react-router-dom";
 import PreviewFilesList from './PreviewFilesList.jsx';
@@ -48,6 +49,17 @@ const Navbar = () => {
 
     loadPreviews();
   }, [getPreviewUrlsFromDocs, getUserFileId, showModal])
+
+  useEffect(() => {
+    if (!showModal) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [showModal]);
   
 
   // useEffect(() => {
@@ -81,7 +93,7 @@ const Navbar = () => {
           }}
         >
           <p className="font-semibold text-[14px] text-black md:text-[22px]">
-            {t('clubTitle')}
+            {/* {t('clubTitle')} */}KuanMatch
           </p>
           <img src={Badminton} alt={t('clubTitle')} className="self-center w-6 h-6" />
         </Link>
@@ -212,21 +224,22 @@ const Navbar = () => {
 
           </div>
         </div>
-        {showModal && (
-          <div className="z-50 fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-              <div className="bg-white shadow-lg p-6 rounded-xl w-[90%] max-w-md">
-                <h2 className="mb-4 font-semibold text-xl">{t('Money Slip')}</h2>
+        {showModal && createPortal(
+          <div className="z-[100] fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 p-4 overscroll-contain">
+              <div className="relative bg-white shadow-lg p-4 sm:p-6 rounded-xl w-full max-w-5xl max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="top-3 right-3 absolute flex justify-center items-center bg-gray-100 hover:bg-gray-200 rounded-full w-9 h-9 text-gray-600 transition"
+                  aria-label={t('close')}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <h2 className="mb-4 pr-12 font-semibold text-xl">{t('Money Slip')}</h2>
                 <PreviewFilesList previewFiles={previewFiles} />
-                <div className="mt-4 text-right">
-                  <button
-                    onClick={() => setShowModal(false)}
-                    className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white"
-                  >
-                    {t('close')}
-                  </button>
-                </div>
               </div>
-          </div>
+          </div>,
+          document.body
         )}
 
       </div>
