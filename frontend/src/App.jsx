@@ -34,6 +34,11 @@ const App = () => {
             <Route path="/sign-in" element={<LogIn />} />
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/liff/checkin" element={<LiffCheckIn />} />
+
+            {/* Public LINE link */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard/:id" element={<Dashboard />} />
+
             {/* User:true then can access Home page */}
             <Route element={<PrivateRoutes />}>
               <Route path="/" element={<Home />} />
@@ -41,8 +46,6 @@ const App = () => {
               <Route path="/matchmaking/:id" element={<CourtPlayer checkedPlayers={checkedPlayers}/>} />
               <Route path="/history/:id" element={<MatchHistory />} />
               <Route path="/summary/:id" element={<Summary checkedPlayers={checkedPlayers} onCheckboxToggle={handleCheckboxToggle}/>} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/dashboard/:id" element={<Dashboard />} />
             </Route>
           
           </Routes>

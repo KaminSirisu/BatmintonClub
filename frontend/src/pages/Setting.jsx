@@ -114,21 +114,28 @@ const Setting = () => {
     }
   };
 
-  const columns = [
-    { header: "name", accessor: "clubName"},
-    { header: "startPrice", accessor: "startPrice"},
-    { header: "perGame", accessor: "pricePerGame"},
-    { header: "playingDays", 
-      accessor: (row) => row.playingDay
+  const formatPlayingDays = (playingDay = '') => (
+    playingDay
       .split(',')
+      .filter(Boolean)
       .map(day => t(day.trim()))
       .join(', ')
-    },
-    { header: "time", 
-      accessor: (row) => `${row.startTime} - ${row.endTime}`},
-    /*{ header: "End Time", accessor: "endTime"},*/
-    
-  ]
+  );
+
+  const columns = [
+    { header: 'name', accessor: 'clubName' },
+    { header: 'startPrice', accessor: (row) => `${row.startPrice}฿` },
+    { header: 'perGame', accessor: (row) => `${row.pricePerGame}฿` },
+    { header: 'playingDays', accessor: (row) => formatPlayingDays(row.playingDay) },
+    { header: 'time', accessor: (row) => `${row.startTime} - ${row.endTime}` },
+  ];
+
+  const handleDeleteClub = async (clubId) => {
+    if (window.confirm(t("Are you sure you want to delete this club?"))) {
+      await deleteClub(clubId);
+      await fetchClubs();
+    }
+  };
 
   const closeModal = () => {
     setIsOpen(false);
@@ -321,62 +328,125 @@ const Setting = () => {
                   </button>
                 </form>
               </div>
-              <div className="mt-5 w-full overflow-x-auto">
-                <h1 className="flex justify-center mt-5 mb-3 uppercase head-text">{t('yourClubs')}</h1>
-                <div>
-                  <Table columns={columns} data={club}>
-                    {({ headers, rows }) => (
-                      <table className="mx-auto mb-10 border border-gray-300 max-w-6xl overflow-x-auto text-[10px] md:text-lg table-auto">
-                        <thead className="bg-white">
-                          <tr>
-                            {headers.map((header, i) => (
-                              <th
-                                key={i}
-                                className="px-6 py-3 font-medium text-gray-500 text-xs md:text-sm text-center uppercase tracking-wider"
-                              >
-                                {t(`${header}`)}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-300">
-                          {rows.map((row, i) => (
-                            <tr key={i} className="hover:bg-gray-100">
-                              {row.cells.map((cell, j) => (
-                                <td
-                                  key={j}
-                                  className="px-6 py-3 font-medium text-black text-xs md:text-sm text-center tracking-wider"
-                                >
-                                  {cell}
-                                </td>
-                              ))}
-                              <td className="px-6 py-4 text-center whitespace-nowrap">
+              <div className="mt-8 px-4 pb-10 w-full">
+                <div className="mx-auto max-w-6xl">
+                  <div className="flex justify-between items-end gap-3 mb-4">
+                    <div>
+                      <h1 className="font-bold text-gray-900 text-xl md:text-2xl">{t('yourClubs')}</h1>
+                      <p className="mt-1 text-gray-500 text-xs md:text-sm">
+                        {club.length} {t('yourClubs')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {club.length === 0 ? (
+                    <div className="bg-white shadow-sm p-8 border border-gray-200 rounded-2xl text-gray-500 text-sm text-center">
+                      {t('No clubs yet')}
+                    </div>
+                  ) : (
+                    <Table columns={columns} data={club}>
+                      {({ headers, rows }) => (
+                        <>
+                          <div className="space-y-3 md:hidden">
+                            {rows.map(({ source: clubRow, cells }) => (
+                              <article key={clubRow.id} className="bg-white shadow-sm p-4 border border-gray-200 rounded-2xl">
+                            <div className="flex justify-between items-start gap-3">
+                              <div className="min-w-0">
+                                <h2 className="font-bold text-gray-900 text-base truncate">{cells[0]}</h2>
+                                <p className="mt-1 text-gray-500 text-xs">
+                                  {cells[4]}
+                                </p>
+                              </div>
+                              <div className="flex gap-1.5">
                                 <button
-                                  onClick={() => {
-                                    openEditModal(club[i]);
-                                  }}
-                                  className="text-blue-500 hover:text-blue-600"
+                                  type="button"
+                                  onClick={() => openEditModal(clubRow)}
+                                  className="flex justify-center items-center bg-blue-50 hover:bg-blue-100 rounded-lg w-9 h-9 text-blue-600 transition"
+                                  aria-label={t('editClub')}
                                 >
                                   <Edit className="w-4 h-4" />
                                 </button>
                                 <button
-                                  onClick={async () => {
-                                    if (window.confirm(t("Are you sure you want to delete this club?"))) {
-                                      await deleteClub(club[i].id);
-                                      await fetchClubs();
-                                    }
-                                  }}
-                                  className="ml-2 text-red-500 hover:text-red-600"
+                                  type="button"
+                                  onClick={() => handleDeleteClub(clubRow.id)}
+                                  className="flex justify-center items-center bg-red-50 hover:bg-red-100 rounded-lg w-9 h-9 text-red-600 transition"
+                                  aria-label={t('delete')}
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
-                  </Table>
+                              </div>
+                            </div>
+                            <div className="gap-2 grid grid-cols-2 mt-4">
+                              <div className="bg-gray-50 p-2.5 rounded-xl">
+                                <p className="text-[10px] text-gray-400 uppercase tracking-wide">{t(headers[1])}</p>
+                                <p className="mt-1 font-semibold text-gray-800 text-sm">{cells[1]}</p>
+                              </div>
+                              <div className="bg-gray-50 p-2.5 rounded-xl">
+                                <p className="text-[10px] text-gray-400 uppercase tracking-wide">{t(headers[2])}</p>
+                                <p className="mt-1 font-semibold text-gray-800 text-sm">{cells[2]}</p>
+                              </div>
+                            </div>
+                            <div className="mt-3 pt-3 border-gray-100 border-t">
+                              <p className="text-[10px] text-gray-400 uppercase tracking-wide">{t(headers[3])}</p>
+                              <p className="mt-1 font-medium text-gray-700 text-sm">{cells[3]}</p>
+                            </div>
+                              </article>
+                            ))}
+                          </div>
+
+                          <div className="hidden md:block bg-white shadow-sm border border-gray-200 rounded-2xl overflow-hidden">
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-left">
+                                <thead className="bg-gray-50 border-gray-200 border-b">
+                                  <tr>
+                                    {[...headers, 'actions'].map((header) => (
+                                      <th key={header} className="px-5 py-3 font-semibold text-[11px] text-gray-500 uppercase tracking-wider">
+                                        {t(header)}
+                                      </th>
+                                    ))}
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                  {rows.map(({ source: clubRow, cells }) => (
+                                    <tr key={clubRow.id} className="hover:bg-gray-50 transition">
+                                      {cells.map((cell, index) => (
+                                        <td
+                                          key={headers[index]}
+                                          className={`px-5 py-4 text-gray-700 text-sm ${index === 0 ? 'font-semibold text-gray-900' : ''} ${index === 1 || index === 2 || index === 4 ? 'whitespace-nowrap' : ''}`}
+                                        >
+                                          {cell}
+                                        </td>
+                                      ))}
+                                  <td className="px-5 py-4 whitespace-nowrap">
+                                    <div className="flex gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => openEditModal(clubRow)}
+                                        className="flex justify-center items-center bg-blue-50 hover:bg-blue-100 rounded-lg w-9 h-9 text-blue-600 transition"
+                                        aria-label={t('editClub')}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteClub(clubRow.id)}
+                                        className="flex justify-center items-center bg-red-50 hover:bg-red-100 rounded-lg w-9 h-9 text-red-600 transition"
+                                        aria-label={t('delete')}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </Table>
+                  )}
                 </div>
               </div>
             </div>

@@ -16,6 +16,7 @@ const Dashboard = () => {
   const { t, language } = useLanguage();
   const { id: urlClubId } = useParams();
   const {
+    user,
     getClubData,
     getDashboardMatchesByClubId,
     subscribeToDashboardMatches,
@@ -148,7 +149,7 @@ const Dashboard = () => {
     <div className="flex flex-col bg-gray-50 min-h-screen">
       <Navbar />
 
-      <div className="flex-grow pb-24 mx-auto w-full max-w-2xl">
+      <div className={`flex-grow mx-auto w-full max-w-2xl ${user ? 'pb-24' : 'pb-6'}`}>
         {/* Date */}
         <p className="px-4 pt-2 sm:pt-4 pb-1 sm:pb-3 text-xs sm:text-sm text-gray-400">{dashboardDate}</p>
 
@@ -212,7 +213,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <BottomNav />
+      {user && <BottomNav />}
     </div>
   );
 };

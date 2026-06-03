@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../utils/AuthContext';
-import { Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useLanguage } from '../utils/LanguageProvider.jsx';
 
 const LogIn = () => {
@@ -104,6 +104,13 @@ const LogIn = () => {
             {t('Sign up')}
           </Link>
         </p>
+        <Link
+          to="/dashboard"
+          className="flex justify-center items-center gap-1.5 mt-5 font-medium text-blue-600 hover:text-blue-700 text-sm transition"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          {t('dashboard')}
+        </Link>
       </div>
     </div>
   )
