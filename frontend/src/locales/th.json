@@ -242,5 +242,6 @@
   "No players found": "ไม่พบผู้เล่น",
   "Please upload a file": "กรุณาอัปโหลดไฟล์",
   "Slip uploaded successfully": "อัปโหลดสลิปสำเร็จ",
-  "Upload failed": "อัปโหลดไม่สำเร็จ"
+  "Upload failed": "อัปโหลดไม่สำเร็จ",
+  "fewestGamesFirst": "เล่นน้อยก่อน"
 }

@@ -2,7 +2,7 @@ import { Link, useParams } from "react-router-dom"
 import Navbar from "../component/Navbar.jsx";
 import BottomNav from '../component/BottomNav.jsx';
 import { useAuth } from '../utils/AuthContext.jsx';
-import { ArrowLeft, History, Plus, Users, X, Filter, Clock, Radio } from "lucide-react";
+import { ArrowDownWideNarrow, ArrowLeft, History, Plus, Users, X, Filter, Clock, Radio } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { toast } from 'react-hot-toast';
 import tennisCourt from '../assets/tennis-court.png';
@@ -77,6 +77,7 @@ const CourtPlayer = ({ checkedPlayers }) => {
   const [skillFilters, setSkillFilters] = useState({});
   const [players, setPlayers] = useState([]);
   const [showSuggest, setShowSuggest] = useState(false);
+  const [sortFewestGamesFirst, setSortFewestGamesFirst] = useState(false);
 
   const skillLevels = ['All', 'VB', 'BG', 'N-', 'N', 'S', 'P'];
 
@@ -256,6 +257,7 @@ const CourtPlayer = ({ checkedPlayers }) => {
       localStorage.removeItem(storageKey);
     }
   }, [id, matches]);
+
   const handleSubmit = () => {
     const newMatch = {
       id: Date.now(),
@@ -376,7 +378,7 @@ const CourtPlayer = ({ checkedPlayers }) => {
       [m.team1.player1?.id, m.team1.player2?.id, m.team2.player1?.id, m.team2.player2?.id].filter(Boolean)
     );
 
-    return players.filter(player =>
+    const filteredPlayers = players.filter(player =>
       (
         // ✅ Allow if:
         !selectedPlayerIds.includes(player.id) ||         // Not selected anywhere
@@ -392,6 +394,15 @@ const CourtPlayer = ({ checkedPlayers }) => {
         player.skillLevel === filter
       )
     );
+
+    if (!sortFewestGamesFirst) {
+      return filteredPlayers;
+    }
+
+    return [...filteredPlayers].sort((a, b) => 
+      (Number(a.gamesPlayed) || 0) - (Number(b.gamesPlayed) || 0)
+    );
+
   };
 
 
@@ -428,6 +439,22 @@ const CourtPlayer = ({ checkedPlayers }) => {
       default: return 'bg-gray-400 text-gray-100';
     }
   };
+
+  const SortFewestGamesButton = ({ className = '' }) => (
+    <button
+      type="button"
+      onClick={() => setSortFewestGamesFirst(prev => !prev)}
+      aria-pressed={sortFewestGamesFirst}
+      className={`flex items-center gap-1.5 shadow-sm px-3 py-1.5 border rounded-full font-medium text-xs md:text-sm transition-colors ${
+        sortFewestGamesFirst
+          ? 'bg-blue-600 border-blue-600 text-white'
+          : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+      } ${className}`}
+    >
+      <ArrowDownWideNarrow size={15} />
+      <span>{t('fewestGamesFirst')}</span>
+    </button>
+  );
 
 
 
@@ -484,13 +511,16 @@ const CourtPlayer = ({ checkedPlayers }) => {
               <Plus size={15} />
               <h1 className="font-medium text-xs md:text-sm">{t('newMatch')}</h1>
             </button>
-            
+            <SortFewestGamesButton className="hidden md:flex" />
           </div>
+          
         </div>
-        
+        <div className="flex justify-end mt-2 md:hidden">
+          <SortFewestGamesButton />
+        </div>
       </div>
+
       <div className="mx-auto mt-2 md:mt-4 mb-20 max-w-7xl">
-        
         {/* Matches Grid */}
         <AnimatePresence>
           <div className="gap-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mx-4 md:mx-6">
@@ -513,23 +543,58 @@ const CourtPlayer = ({ checkedPlayers }) => {
                   </button>
                 </div> */}
                 <div className="p-2.5">
-                  {/* Card header: status badge + delete */}
-                  <div className="flex justify-between items-center mb-1.5">
-                    {match.matchStatus === 'waiting' && (
-                      <span className="flex items-center gap-1 bg-amber-100 px-2 py-0.5 rounded-full font-semibold text-[10px] text-amber-700 uppercase tracking-wide">
-                        <Clock size={10} /> Waiting
-                      </span>
-                    )}
-                    {match.matchStatus === 'playing' && (
-                      <span className="flex items-center gap-1 bg-red-100 px-2 py-0.5 rounded-full font-semibold text-[10px] text-red-600 uppercase tracking-wide animate-pulse">
-                        <Radio size={10} /> Live
-                      </span>
-                    )}
-                    {(!match.matchStatus || match.matchStatus === 'draft') && (
-                      <span className="flex items-center gap-1 bg-gray-100 px-2 py-0.5 rounded-full font-semibold text-[10px] text-gray-500 uppercase tracking-wide">
-                        Draft
-                      </span>
-                    )}
+                  {/* Card header: status badge + court/skill controls + delete */}
+                  <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
+                    <div className="flex items-center">
+                      {match.matchStatus === 'waiting' && (
+                        <span className="flex items-center gap-1 bg-amber-100 px-2 py-0.5 rounded-full font-semibold text-[10px] text-amber-700 uppercase tracking-wide">
+                          <Clock size={10} /> Waiting
+                        </span>
+                      )}
+                      {match.matchStatus === 'playing' && (
+                        <span className="flex items-center gap-1 bg-red-100 px-2 py-0.5 rounded-full font-semibold text-[10px] text-red-600 uppercase tracking-wide animate-pulse">
+                          <Radio size={10} /> Live
+                        </span>
+                      )}
+                      {(!match.matchStatus || match.matchStatus === 'draft') && (
+                        <span className="flex items-center gap-1 bg-gray-100 px-2 py-0.5 rounded-full font-semibold text-[10px] text-gray-500 uppercase tracking-wide">
+                          Draft
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <img src={tennisCourt} alt={t('Tennis Court')} className="self-center w-5 h-5"/>
+                      <select
+                        className="disabled:opacity-50 px-1.5 py-1 border border-gray-300 rounded-lg text-[10px] disabled:cursor-not-allowed"
+                        disabled={match.matchStatus === 'waiting' || match.matchStatus === 'playing'}
+                        onChange={e => {
+                          const courtNum = parseInt(e.target.value);
+                          setMatches(matches.map(m => m.id === match.id ? { ...m, courtNumber: courtNum } : m));
+                        }}
+                        value={match.courtNumber || ""}
+                      >
+                        <option value="" disabled>
+                          {t('court')}
+                        </option>
+                        {Array.from({ length: 20 }, (_, i) => (
+                          <option key={i + 1} value={i + 1}>{i + 1}</option>
+                        ))}
+                      </select>
+
+                      <Filter size={13} className="self-center text-gray-500" />
+                      <select
+                        value={skillFilters[match.id] || 'All'}
+                        onChange={(e) => updateSkillFilter(match.id, e.target.value)}
+                        disabled={match.matchStatus === 'waiting' || match.matchStatus === 'playing'}
+                        className="disabled:opacity-50 px-1.5 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-[10px] disabled:cursor-not-allowed"
+                      >
+                        {skillLevels.map(level => (
+                          <option key={level} value={level}>{t(`${level}`)}</option>
+                        ))}
+                      </select>
+                    </div>
+
                     {match.matchStatus === 'draft' || !match.matchStatus ? (
                       <button
                         onClick={() => setMatches(matches.filter(m => m.id !== match.id))}
@@ -537,46 +602,8 @@ const CourtPlayer = ({ checkedPlayers }) => {
                         <X size={16} className="text-black hover:text-red-500" />
                       </button>
                     ) : (
-                      <div />
+                      <div className="w-4" />
                     )}
-                  </div>
-
-                  {/* Skill Filter for this match */}
-                  <div className="mb-2">
-                    <div className="flex justify-center items-center gap-2">
-                      {/* Court Number */}
-                      <div className="flex flex-row items-center gap-2 md:gap-3">
-                        <img src={tennisCourt} alt={t('Tennis Court')} className="self-center w-6 h-6"/>
-                        <select
-                          className="disabled:opacity-50 mt-1 px-2 py-1.5 border border-gray-300 rounded-lg text-[10px] disabled:cursor-not-allowed"
-                          disabled={match.matchStatus === 'waiting' || match.matchStatus === 'playing'}
-                          onChange={e => {
-                            const courtNum = parseInt(e.target.value);
-                            setMatches(matches.map(m => m.id === match.id ? { ...m, courtNumber: courtNum } : m));
-                          }}
-                          value={match.courtNumber || ""}
-                        >
-                          <option value="" disabled>
-                            {t('court')}
-                          </option>
-                          {Array.from({ length: 20 }, (_, i) => (
-                            <option key={i + 1} value={i + 1}>{i + 1}</option>
-                          ))}
-                        </select>
-
-                        <Filter size={14} className="self-center text-gray-500" />
-                        <select
-                          value={skillFilters[match.id] || 'All'}
-                          onChange={(e) => updateSkillFilter(match.id, e.target.value)}
-                          disabled={match.matchStatus === 'waiting' || match.matchStatus === 'playing'}
-                          className="disabled:opacity-50 px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-[10px] disabled:cursor-not-allowed"
-                        >
-                          {skillLevels.map(level => (
-                            <option key={level} value={level}>{t(`${level}`)}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Team 1 */}
@@ -596,7 +623,7 @@ const CourtPlayer = ({ checkedPlayers }) => {
                           <option value=''>{t('selectPlayer')}</option>
                           {getFilteredPlayers(match.id, 'team1', 'player1').map(player => (
                             <option key={player.id} value={player.id}>
-                              {player.name}
+                              {player.name} ({Number(player.gamesPlayed) || 0} {t('games')})
                             </option>
                           ))}
                         </select>
@@ -626,7 +653,7 @@ const CourtPlayer = ({ checkedPlayers }) => {
                           <option value="">{t('selectPlayer')}</option>
                           {getFilteredPlayers(match.id, 'team1', 'player2').map(player => (
                             <option key={player.id} value={player.id}>
-                              {player.name}
+                              {player.name} ({Number(player.gamesPlayed) || 0} {t('games')})
                             </option>
                           ))}
                         </select>
@@ -671,7 +698,7 @@ const CourtPlayer = ({ checkedPlayers }) => {
                           <option value="">{t('selectPlayer')}</option>
                           {getFilteredPlayers(match.id, 'team2', 'player1').map(player => (
                             <option key={player.id} value={player.id}>
-                              {player.name}
+                              {player.name} ({Number(player.gamesPlayed) || 0} {t('games')})
                             </option>
                           ))}
                         </select>
@@ -701,7 +728,7 @@ const CourtPlayer = ({ checkedPlayers }) => {
                           <option value="">{t('selectPlayer')}</option>
                           {getFilteredPlayers(match.id, 'team2', 'player2').map(player => (
                             <option key={player.id} value={player.id}>
-                              {player.name}
+                              {player.name} ({Number(player.gamesPlayed) || 0} {t('games')})
                             </option>
                           ))}
                         </select>

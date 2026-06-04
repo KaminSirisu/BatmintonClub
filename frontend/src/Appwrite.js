@@ -45,18 +45,4 @@ export const databases = new Databases(client);
 export const account = new Account(client);
 export const storage = new Storage(client);
 
-
-/*
-export const createAccount = async () => {
-  try {
-    await databases.createDocument(DATABASE_ID, USERS_COLLECTION_ID, {
-      email,
-      nickname,
-      skillLevel,
-    })
-  } catch (e) {
-    console.error(e)
-  }
-}
-*/
 export default client;

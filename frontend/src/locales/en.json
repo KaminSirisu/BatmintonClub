@@ -241,5 +241,6 @@
   "No players found": "No players found",
   "Please upload a file": "Please upload a file",
   "Slip uploaded successfully": "Slip uploaded successfully",
-  "Upload failed": "Upload failed"
+  "Upload failed": "Upload failed",
+  "fewestGamesFirst": "Fewest first"
 }

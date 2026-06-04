@@ -91,7 +91,7 @@ const Summary = ({ checkedPlayers, onCheckboxToggle }) => {
       <div className="flex justify-center items-center mx-2 md:mx-4 mt-3 md:mt-4 relatvie">
         <button
           onClick={() => navigate(-1)}
-          className="top-[68px] left-4 z-50 fixed bg-white shadow-lg hover:shadow-xl border border-gray-200 rounded-full p-0.5 transition"
+          className="top-[60px] sm:top-[70px] left-4 z-50 fixed bg-white shadow-lg hover:shadow-xl border border-gray-200 rounded-full transition"
         >
           <ArrowLeft className="w-7 md:w-8 h-7 md:h-8 text-blue-600 cursor-pointer" />
         </button>
@@ -100,7 +100,7 @@ const Summary = ({ checkedPlayers, onCheckboxToggle }) => {
 
       {/* Filter Players */}
       <div>
-        <div className="flex md:flex-row flex-col justify-between md:justify-center items-center gap-4 mt-4 md:mt-6 mb-6">
+        <div className="flex md:flex-row flex-col justify-between md:justify-center items-center gap-4 mt-3 md:mt-6 mb-3 md:mb-6">
           <div className="flex gap-2 md:gap-4">
             <div className="relative flex items-center w-[180px] lg:w-[220px]">
               <Search className="top-1/2 left-3 absolute w-3 h-3 text-gray-400 -translate-y-1/2 transform" />
@@ -160,31 +160,31 @@ const Summary = ({ checkedPlayers, onCheckboxToggle }) => {
                     key={player.id}
                     className=""
                   >
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-2 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         
                         <span className={`px-1.5 py-0.5 text-[10px] md:text-xs font-medium rounded-full ${getSkillLevelColor(player.skillLevel)}`}>
                           {player.skillLevel}
                         </span>
-                        <h1 className="font-medium text-gray-900 text-sm">
+                        <h1 className="font-medium text-gray-900 text-xs sm:text-sm">
                           {player.name}
                         </h1>
 
                       </div>
                     </td>
-                    <td className="px-2 py-4 whitespace-nowrap">
-                      <span className="flex px-2 py-1 rounded-full font-medium text-sm">
+                    <td className="px-2 py-2 whitespace-nowrap">
+                      <span className="flex px-2 py-1 rounded-full font-medium text-xs sm:text-sm">
                         {player.gamesPlayed}
                       </span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <span className="px-2 py-1 rounded-full font-medium text-sm">
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <span className="px-2 py-1 rounded-full font-medium text-xs sm:text-sm">
                         {player.gamesPlayed === 0
                           ? 0
                           : startPrice + (player.gamesPlayed * pricePerGame)}฿
                       </span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-2 whitespace-nowrap">
                       <span className="px-2 py-1 rounded-full font-medium text-sm">
                         <input
                           type="checkbox"
@@ -202,7 +202,7 @@ const Summary = ({ checkedPlayers, onCheckboxToggle }) => {
                         />
                       </span>
                     </td>
-                    <td className="px-2 py-4 whitespace-nowrap" onClick={() => setSelectedPlayer(player)} >
+                    <td className="px-2 py-2 whitespace-nowrap" onClick={() => setSelectedPlayer(player)} >
                       <button
                         onClick={(e) => {
                           e.stopPropagation(); // prevent row click if needed
