@@ -258,5 +258,6 @@
   "Yes, Overwrite": "ใช่ เขียนทับ",
   "No players with games played to export.": "ไม่มีผู้เล่นที่มีจำนวนเกมให้ส่งออก",
   "VITE_API_URL is missing.": "ยังไม่ได้ตั้งค่า VITE_API_URL",
-  "Export successful.": "ส่งออกข้อมูลสำเร็จ"
+  "Export successful.": "ส่งออกข้อมูลสำเร็จ",
+  "Failed to export data.": "ส่งออกข้อมูลไม่สำเร็จ"
 }

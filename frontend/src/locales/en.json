@@ -257,5 +257,6 @@
   "Yes, Overwrite": "Yes, Overwrite",
   "No players with games played to export.": "No players with games played to export.",
   "VITE_API_URL is missing.": "VITE_API_URL is missing.",
-  "Export successful.": "Export successful."
+  "Export successful.": "Export successful.",
+  "Failed to export data.": "Failed to export data."
 }
