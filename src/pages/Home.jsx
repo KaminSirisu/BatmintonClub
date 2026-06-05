@@ -360,7 +360,7 @@ const Home = () => {
             <h1 className='head-text'>
               {t('welcome')}, <b>{name}</b>
             </h1>
-            <h2 className='text-[11px] text-gray-500 mb-4'>
+            <h2 className='mb-4 text-[11px] text-gray-500'>
               {t('manage your badminton clubs and players')}
             </h2>
 
@@ -380,13 +380,13 @@ const Home = () => {
                       {/* Left: Club info */}
                       <div className="flex-1 min-w-0">
                         <h3 className={`font-bold text-sm sm:text-base md:text-lg ${colors} leading-tight`}>{club.clubName}</h3>
-                        <p className="text-gray-500 text-xs sm:text-sm mt-0.5">
+                        <p className="mt-0.5 text-gray-500 text-xs sm:text-sm">
                           {club.playingDay.split(',').map(day => t(day.trim())).join(', ')}
                         </p>
-                        <p className="text-gray-500 text-xs sm:text-sm">{club.startTime}–{club.endTime}</p>
+                        <p className="text-gray-500 text-xs sm:text-sm">{club.startTime}-{club.endTime}</p>
                       </div>
                       {/* Right: Buttons stacked */}
-                      <div className="flex flex-col items-end gap-1.5 sm:gap-2 flex-shrink-0">
+                      <div className="flex flex-col flex-shrink-0 items-end gap-1.5 sm:gap-2">
                         <Link
                           to={`/matchmaking/${club.id}`}
                           className={`${colorss} px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl font-semibold text-white text-xs sm:text-sm shadow-sm hover:opacity-90 transition`}
@@ -395,38 +395,38 @@ const Home = () => {
                         </Link>
                         <Link
                           to={`/dashboard/${club.id}`}
-                          className="flex items-center justify-center gap-1 border border-red-100 bg-red-50 shadow-[0_0_18px_rgba(239,68,68,0.18)] px-3 py-1.5 sm:px-4 rounded-xl font-medium text-red-600 text-xs sm:text-sm hover:bg-red-100 transition text-center"
+                          className="flex justify-center items-center gap-1 bg-red-50 hover:bg-red-100 shadow-[0_0_18px_rgba(239,68,68,0.18)] px-3 sm:px-4 py-1.5 border border-red-100 rounded-xl font-medium text-red-600 text-xs sm:text-sm text-center transition"
                         >
-                          <span className="relative inline-flex items-center justify-center w-3 h-3">
-                            <span className="absolute inline-flex bg-red-400 opacity-75 rounded-full w-full h-full animate-ping" />
-                            <span className="relative inline-flex bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.95)] rounded-full w-2 h-2" />
+                          <span className="inline-flex relative justify-center items-center w-3 h-3">
+                            <span className="inline-flex absolute bg-red-400 opacity-75 rounded-full w-full h-full animate-ping" />
+                            <span className="inline-flex relative bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.95)] rounded-full w-2 h-2" />
                           </span>
                           {t('MatchStatus')}
                         </Link>
                       </div>
                     </div>
-                    {/* Bottom: Member count + check-in */}
-                    <div className="flex items-center justify-between">
+                    {/* Bottom: Member count + daily actions */}
+                    <div className="flex flex-wrap justify-between items-center gap-2">
                       <div className="flex items-center text-gray-600">
                         <Users className="mr-1 w-4 h-4" />
                         <span className="text-xs sm:text-sm">{getClubMemberCount(club.id)}</span>
                       </div>
-                      <button
-                        onClick={() => handleOpenBookingsModal(club)}
-                        className="flex items-center gap-1 text-amber-600 hover:text-amber-700 text-[11px] sm:text-xs transition"
-                      >
-                        <CalendarClockIcon size={12} />
-                        <span>{t("Today's bookings")}</span>
-                      </button>
-                    </div>
-                    <div className='flex justify-end'>
-                      <button
-                        onClick={() => handleLoadCheckIns(club)}
-                        className="flex items-center gap-1 text-gray-400 hover:text-gray-600 text-[11px] sm:text-xs transition"
-                      >
-                        <Users size={12} />
-                        <span>{t("Today's Check-ins")}</span>
-                      </button>
+                      <div className="flex flex-wrap justify-end items-center gap-x-3 gap-y-1">
+                        <button
+                          onClick={() => handleOpenBookingsModal(club)}
+                          className="flex items-center gap-1 text-[11px] text-amber-600 hover:text-amber-700 sm:text-xs transition"
+                        >
+                          <CalendarClockIcon size={12} />
+                          <span>{t("Today's bookings")}</span>
+                        </button>
+                        <button
+                          onClick={() => handleLoadCheckIns(club)}
+                          className="flex items-center gap-1 text-[11px] text-gray-400 hover:text-gray-600 sm:text-xs transition"
+                        >
+                          <Users size={12} />
+                          <span>{t("Today's Check-ins")}</span>
+                        </button>
+                      </div>
                     </div>
 
                   </div>
@@ -461,7 +461,7 @@ const Home = () => {
                       {bookings.map((booking) => (
                         <div
                           key={booking.$id}
-                          className='flex justify-between items-center gap-3 border border-gray-200 p-3 rounded-xl'
+                          className='flex justify-between items-center gap-3 p-3 border border-gray-200 rounded-xl'
                         >
                           <div>
                             <p className="font-semibold text-gray-800">
@@ -497,7 +497,7 @@ const Home = () => {
             <section className="mb-6">
               <div className="flex justify-between items-end gap-3 mb-3">
                 <div>
-                  <h2 className="font-bold text-base text-gray-800">{t("Today's Check-ins")}</h2>
+                  <h2 className="font-bold text-gray-800 text-base">{t("Today's Check-ins")}</h2>
                   <p className="mt-0.5 text-gray-500 text-xs">
                     {checkInClub
                       ? `${checkInClub.clubName} · ${t('QR arrivals')}`
@@ -514,17 +514,17 @@ const Home = () => {
                 )}
               </div>
 
-              <div className="bg-white border border-gray-200 rounded-2xl overflow-x-auto shadow-sm">
+              <div className="bg-white shadow-sm border border-gray-200 rounded-2xl overflow-x-auto">
                 {checkIns.length > 0 ? (
-                  <table className="w-full min-w-[760px] text-left text-sm">
+                  <table className="w-full min-w-[760px] text-sm text-left">
                     <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
                       <tr>
-                        <th className="px-4 sm:py-3 py-2">{t('time')}</th>
-                        <th className="px-4 sm:py-3 py-2">{t('LINE name')}</th>
-                        <th className="px-4 sm:py-3 py-2">{t('Player name')}</th>
-                        <th className="px-4 sm:py-3 py-2">{t('Skill')}</th>
-                        <th className="px-4 sm:py-3 py-2">{t('Status')}</th>
-                        <th className="px-4 sm:py-3 py-2">{t('Action')}</th>
+                        <th className="px-4 py-2 sm:py-3">{t('time')}</th>
+                        <th className="px-4 py-2 sm:py-3">{t('LINE name')}</th>
+                        <th className="px-4 py-2 sm:py-3">{t('Player name')}</th>
+                        <th className="px-4 py-2 sm:py-3">{t('Skill')}</th>
+                        <th className="px-4 py-2 sm:py-3">{t('Status')}</th>
+                        <th className="px-4 py-2 sm:py-3">{t('Action')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -534,13 +534,13 @@ const Home = () => {
 
                         return (
                           <tr key={checkIn.$id} className="align-top">
-                            <td className="px-4 sm:py-3 py-2 font-semibold text-gray-700">
+                            <td className="px-4 py-2 sm:py-3 font-semibold text-gray-700">
                               {checkIn.checkInTime}
                             </td>
-                            <td className="px-4 sm:py-3 py-2 text-gray-700">
+                            <td className="px-4 py-2 sm:py-3 text-gray-700">
                               {checkIn.lineDisplayName || checkIn.name}
                             </td>
-                            <td className="px-4 sm:py-3 py-2">
+                            <td className="px-4 py-2 sm:py-3">
                               {isPending ? (
                                 <input
                                   type="text"
@@ -555,7 +555,7 @@ const Home = () => {
                                 <span className="font-semibold text-gray-800">{checkIn.name}</span>
                               )}
                             </td>
-                            <td className="px-4 sm:py-3 py-2">
+                            <td className="px-4 py-2 sm:py-3">
                               {isPending ? (
                                 <select
                                   value={draft.skillLevel || 'VB'}
@@ -577,7 +577,7 @@ const Home = () => {
                                 </span>
                               )}
                             </td>
-                            <td className="px-4 sm:py-3 py-2">
+                            <td className="px-4 py-2 sm:py-3">
                               <span
                                 className={`inline-flex px-2 py-1 rounded-full font-semibold text-xs ${
                                   isPending
@@ -588,7 +588,7 @@ const Home = () => {
                                 {isPending ? t('Setup needed') : t('Ready')}
                               </span>
                             </td>
-                            <td className="px-4 sm:py-3 py-2">
+                            <td className="px-4 py-2 sm:py-3">
                               {isPending ? (
                                 <button
                                   onClick={() => handleCompletePendingCheckIn(checkIn)}
@@ -607,7 +607,7 @@ const Home = () => {
                     </tbody>
                   </table>
                 ) : (
-                  <p className="px-4 py-8 text-gray-500 text-center text-sm">
+                  <p className="px-4 py-8 text-gray-500 text-sm text-center">
                     {checkInClub
                       ? t('No check-ins yet for today')
                       : t('No club selected')}
@@ -618,10 +618,10 @@ const Home = () => {
 
             {/* Player Section Header */}
             <div className="flex justify-between items-center mb-3">
-              <h2 className="font-bold text-base text-gray-800">{t('players')}</h2>
+              <h2 className="font-bold text-gray-800 text-base">{t('players')}</h2>
               <button
                 onClick={() => setShowAddPlayerModal(true)}
-                className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-xl text-white text-sm font-semibold transition-colors shadow-sm"
+                className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 shadow-sm px-3 py-2 rounded-xl font-semibold text-white text-sm transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 {t('add player')}
@@ -631,17 +631,17 @@ const Home = () => {
             {/* Search + Filter */}
             <div className="flex gap-2 mb-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="top-1/2 left-3 absolute w-4 h-4 text-gray-400 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder={t('search players...')}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  className="bg-white py-2 pr-3 pl-10 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 w-full text-sm"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
               <select
-                className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                className="bg-white px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 value={skillFilter}
                 onChange={(e) => setSkillFilter(e.target.value)}
               >
@@ -656,7 +656,7 @@ const Home = () => {
             </div>
 
             {/* Player count */}
-            <p className="text-sm text-gray-500 mb-2">
+            <p className="mb-2 text-gray-500 text-sm">
               {filteredPlayers.length} of {players.length} {t('players')}
             </p>
 
@@ -740,7 +740,7 @@ const Home = () => {
             )}
 
             {/* Players List */}
-            <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-white shadow-sm border border-gray-200 rounded-2xl overflow-hidden">
               {filteredPlayers.map((player, index) => (
                 <div
                   key={player.id}
@@ -757,7 +757,7 @@ const Home = () => {
                   {/* Name */}
                   <div className="flex-1 min-w-0 font-medium text-gray-800 text-xs sm:text-sm truncate">{player.name}</div>
                   {/* Club Toggles */}
-                  <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                  <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2">
                     {club.map((clubItem, cIndex) => {
                       const color = bgColors[cIndex % bgColors.length];
                       return (
@@ -772,14 +772,14 @@ const Home = () => {
                   </div>
                   {/* Edit */}
                   <button
-                    className="text-gray-400 hover:text-blue-500 p-0.5 sm:p-1 text-sm sm:text-base transition-colors flex-shrink-0"
+                    className="flex-shrink-0 p-0.5 sm:p-1 text-blue-500 text-sm sm:text-base transition-colors"
                     onClick={() => { setEditingPlayer(player); setShowUpdatePlayerModal(true); }}
                   >
-                    ✏️
+                    <Edit className='w-4 h-4'/>
                   </button>
                   {/* Delete */}
                   <button
-                    className="text-gray-400 hover:text-red-500 p-0.5 sm:p-1 text-sm sm:text-base transition-colors flex-shrink-0"
+                    className="flex-shrink-0 p-0.5 sm:p-1 text-red-500 text-sm sm:text-base transition-colors"
                     onClick={async () => {
                       if (window.confirm(t("Are you sure you want to delete this player?"))) {
                         await deletePlayer(player.id, async () => {
@@ -789,12 +789,12 @@ const Home = () => {
                       }
                     }}
                   >
-                    🗑
+                    <Trash2 className='w-4 h-4'/>
                   </button>
                 </div>
               ))}
               {filteredPlayers.length === 0 && (
-                <div className="py-10 text-center text-gray-400 text-sm">{t('No players found')}</div>
+                <div className="py-10 text-gray-400 text-sm text-center">{t('No players found')}</div>
               )}
             </div>
 
@@ -852,7 +852,7 @@ const Home = () => {
           // User Site
           <div className='px-4 sm:px-8 pt-4 sm:pt-6'>
             <h1 className='head-text'>{t('welcome')}, <b>{name}</b></h1>
-            <h2 className='text-[11px] text-gray-500 mb-4'>{t('Check in the game — your club is waiting.')}</h2>
+            <h2 className='mb-4 text-[11px] text-gray-500'>{t('Check in the game — your club is waiting.')}</h2>
 
             {/* Clubs List */}
             <div className="flex flex-col gap-3">
@@ -870,13 +870,13 @@ const Home = () => {
                       {/* Left: Club info */}
                       <div className="flex-1 min-w-0">
                         <h3 className={`font-bold text-sm sm:text-base md:text-lg ${colors} leading-tight`}>{club.clubName}</h3>
-                        <p className="text-gray-500 text-xs sm:text-sm mt-0.5">
+                        <p className="mt-0.5 text-gray-500 text-xs sm:text-sm">
                           {club.playingDay.split(',').map(day => t(day.trim())).join(', ')}
                         </p>
                         <p className="text-gray-500 text-xs sm:text-sm">{club.startTime}-{club.endTime}</p>
                       </div>
                       {/* Right: Buttons stacked */}
-                      <div className="flex flex-col items-end gap-1.5 sm:gap-2 flex-shrink-0">
+                      <div className="flex flex-col flex-shrink-0 items-end gap-1.5 sm:gap-2">
                         {bookedClubs.includes(club.id) ? (
                           <span className="font-semibold text-green-600 text-xs sm:text-sm">✓ Booked</span>
                         ) : (
@@ -890,7 +890,7 @@ const Home = () => {
                         )}
                         <button
                           onClick={() => handleOpenUploadSlipModal(club)}
-                          className="border border-gray-200 bg-white px-3 py-1.5 sm:px-4 rounded-xl font-medium text-gray-600 text-xs sm:text-sm flex items-center gap-1 hover:bg-gray-50 transition"
+                          className="flex items-center gap-1 bg-white hover:bg-gray-50 px-3 sm:px-4 py-1.5 border border-gray-200 rounded-xl font-medium text-gray-600 text-xs sm:text-sm transition"
                         >
                           <Clipboard size={13} />
                           {t('money slip')}
@@ -957,15 +957,15 @@ const Home = () => {
                   
                   {/* Payment Info Section */}
                   {(uploadingSlipClub.paymentBank || uploadingSlipClub.paymentAccountName || uploadingSlipClub.paymentAccountNumber || uploadingSlipClub.paymentQrDisplayUrl || uploadingSlipClub.paymentQrPreviewUrl || uploadingSlipClub.paymentQrDownloadUrl) ? (
-                    <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <h4 className="font-semibold text-blue-900 mb-3">{t('Payment Details')}</h4>
+                    <div className="bg-blue-50 mb-6 p-4 border border-blue-200 rounded-lg">
+                      <h4 className="mb-3 font-semibold text-blue-900">{t('Payment Details')}</h4>
                       
                       {(uploadingSlipClub.paymentQrDisplayUrl || uploadingSlipClub.paymentQrDownloadUrl || uploadingSlipClub.paymentQrPreviewUrl) ? (
-                        <div className="mb-4 flex justify-center">
+                        <div className="flex justify-center mb-4">
                           <img 
                             src={uploadingSlipClub.paymentQrDisplayUrl || uploadingSlipClub.paymentQrDownloadUrl || uploadingSlipClub.paymentQrPreviewUrl} 
                             alt={t('Payment QR Code')}
-                            className="w-40 h-40 border-2 border-blue-300 rounded"
+                            className="border-2 border-blue-300 rounded w-40 h-40"
                           />
                         </div>
                       ) : (
@@ -987,7 +987,7 @@ const Home = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="bg-gray-50 mb-6 p-4 border border-gray-200 rounded-lg">
                       <p className="text-gray-600 text-sm text-center">
                         {t("No payment details added for this club yet")}
                       </p>

@@ -387,6 +387,7 @@ export const AuthProvider = ({ children }) => {
         skillLevel: doc.skillLevel,
         club: doc.club || [], // safely fallback to empty array
         gamesPlayed: doc.gamesPlayed || 0,
+        paidStatus: doc.paidStatus === true || doc.paidStatus === 'paid',
       }));
       
     } catch (e) {
@@ -406,8 +407,12 @@ export const AuthProvider = ({ children }) => {
         playerId, // using Appwrite's document ID
         updatedData
       );
+      return true;
     } catch (e) {
       console.error("Failed to Update Players:", e)
+      return false;
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -884,11 +889,12 @@ export const AuthProvider = ({ children }) => {
         )
       );
 
-      // 4. Reset gamesPlayed to 0 for all PLAYERS in parallel
+      // 4. Reset gamesPlayed and paid status for all PLAYERS in parallel
       await Promise.all(
         players.documents.map((player) =>
           databases.updateDocument(DATABASE_ID, PLAYERS_COLLECTION_ID, player.$id, {
             gamesPlayed: 0,
+            paidStatus: 'unpaid',
           })
         )
       );

@@ -60,7 +60,7 @@ const syncLocalMatchesWithDashboard = (savedMatches, dashboardMatches) => {
   });
 };
 
-const CourtPlayer = ({ checkedPlayers }) => {
+const CourtPlayer = () => {
   const {
     getPlayers,
     getDashboardMatchesByClubId,
@@ -179,9 +179,9 @@ const CourtPlayer = ({ checkedPlayers }) => {
     const updatedSuggestions = [...suggestedMatch];
     updatedSuggestions.splice(usedMatchIndex, 1);
 
-    const uncheckedPlayers = players.filter(player => !checkedPlayers[player.id]);
+    const unpaidPlayers = players.filter(player => !player.paidStatus);
     // Try to generate one new suggestion
-    const newSuggestions = generateBalancedMatches(uncheckedPlayers);
+    const newSuggestions = generateBalancedMatches(unpaidPlayers);
     if (newSuggestions.length > 0) {
       // Only add one new suggestion (replace the removed one)
       updatedSuggestions.push(newSuggestions[0]);
@@ -385,7 +385,7 @@ const CourtPlayer = ({ checkedPlayers }) => {
         player.id === currentSelectedPlayerId             // OR currently selected in this slot
       ) &&
       (
-        !checkedPlayers[player.id] || 
+        !player.paidStatus ||
         player.id === currentSelectedPlayerId
       ) &&
       (
@@ -481,10 +481,10 @@ const CourtPlayer = ({ checkedPlayers }) => {
               className="flex items-center gap-1 bg-white hover:bg-gray-500 shadow-sm px-2 py-1 rounded-2xl text-black hover:text-white transition-colors"
               onClick={() => {
                 // Filter out checked players before generating matches
-                const uncheckedPlayers = players.filter(player => !checkedPlayers[player.id]);
+                const unpaidPlayers = players.filter(player => !player.paidStatus);
 
                 // Pass filtered players to your function
-                const matches = generateBalancedMatches(uncheckedPlayers);
+                const matches = generateBalancedMatches(unpaidPlayers);
                 if (matches.length > 0) {
                     setSuggestedMatch(matches);
                     setShowSuggest(true);

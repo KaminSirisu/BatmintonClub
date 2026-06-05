@@ -243,5 +243,6 @@
   "Please upload a file": "กรุณาอัปโหลดไฟล์",
   "Slip uploaded successfully": "อัปโหลดสลิปสำเร็จ",
   "Upload failed": "อัปโหลดไม่สำเร็จ",
-  "fewestGamesFirst": "เล่นน้อยก่อน"
+  "fewestGamesFirst": "เล่นน้อยก่อน",
+  "Export to Google Sheets": "ส่งออกไปยัง Google Sheets"
 }

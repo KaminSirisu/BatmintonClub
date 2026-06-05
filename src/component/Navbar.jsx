@@ -6,10 +6,11 @@ import { Link, useLocation } from "react-router-dom";
 import PreviewFilesList from './PreviewFilesList.jsx';
 import Badminton from "../assets/badminton.png";
 import { useLanguage } from '../utils/LanguageProvider.jsx';
+import LanguageToggle from './LanguageToggle.jsx';
 
 
 const Navbar = () => {
-  const { t, changeLanguage, language } = useLanguage();
+  const { t } = useLanguage();
 
   const [previewFiles, setPreviewFiles] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -100,7 +101,8 @@ const Navbar = () => {
 
         {!user ? (
           <>
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-3">
+              
               <Link
                 to="/sign-in"
                 className="px-3 py-1.5 font-medium text-gray-700 hover:text-blue-600 text-sm transition"
@@ -113,6 +115,9 @@ const Navbar = () => {
               >
                 {t('Sign up')}
               </Link>
+              <div className="bg-neutral-300 w-px h-6" />
+              <LanguageToggle />
+              
             </div>
             <div className="md:hidden relative flex justify-end items-center">
               <button
@@ -144,20 +149,7 @@ const Navbar = () => {
                   {t('Sign up')}
                 </Link>
                 <div className="bg-neutral-300 w-full h-px" />
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => changeLanguage('en')}
-                    className={`px-3 py-1 rounded-lg text-sm ${language === 'en' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-                  >
-                    EN
-                  </button>
-                  <button
-                    onClick={() => changeLanguage('th')}
-                    className={`px-3 py-1 rounded-lg text-sm ${language === 'th' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-                  >
-                    TH
-                  </button>
-                </div>
+                <LanguageToggle />
               </div>
             </div>
           </>
@@ -197,20 +189,7 @@ const Navbar = () => {
           </button>
           {/* Vertical divider line */}
           <div className="bg-neutral-300 w-px h-6" />
-          <div className='flex space-x-1'>
-            <button
-              onClick={() => changeLanguage('en')}
-              className={`px-2 py-1 rounded-lg text-xs md:text-sm ${language === 'en' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-            >
-              EN
-            </button>
-            <button
-              onClick={() => changeLanguage('th')}
-              className={`px-2 py-1 rounded-lg text-xs md:text-sm ${language === 'th' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-            >
-              TH
-            </button>
-          </div>
+          <LanguageToggle />
           
 
             </div>
@@ -271,20 +250,7 @@ const Navbar = () => {
             {/* Horizontal line */}
             <div className="bg-neutral-300 w-full h-px" />
             <h1 className='text-xs'>{t('change language')}</h1>
-            <div className='flex space-x-2'>
-              <button
-                onClick={() => changeLanguage('en')}
-                className={`px-3 py-1 rounded-lg text-sm ${language === 'en' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-              >
-                EN
-              </button>
-              <button
-                onClick={() => changeLanguage('th')}
-                className={`px-3 py-1 rounded-lg text-sm ${language === 'th' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-              >
-                TH
-              </button>
-            </div>
+            <LanguageToggle />
 
           </div>
             </div>

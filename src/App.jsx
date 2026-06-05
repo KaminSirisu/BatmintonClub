@@ -1,4 +1,3 @@
-import {useState} from 'react'
 import LogIn from './pages/LogIn'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PrivateRoutes from './utils/PrivateRoutes';
@@ -17,14 +16,6 @@ import { LanguageProvider } from './utils/LanguageProvider';
 
 
 const App = () => {
-  const [checkedPlayers, setCheckedPlayers] = useState({});
-
-  const handleCheckboxToggle = (playerId) => {
-    setCheckedPlayers(prev => ({
-      ...prev,
-      [playerId]: !prev[playerId],
-    }));
-  };
   return (
     <LanguageProvider>
       <Router>
@@ -43,9 +34,9 @@ const App = () => {
             <Route element={<PrivateRoutes />}>
               <Route path="/" element={<Home />} />
               <Route path="/setting" element={<Setting />} />
-              <Route path="/matchmaking/:id" element={<CourtPlayer checkedPlayers={checkedPlayers}/>} />
+              <Route path="/matchmaking/:id" element={<CourtPlayer />} />
               <Route path="/history/:id" element={<MatchHistory />} />
-              <Route path="/summary/:id" element={<Summary checkedPlayers={checkedPlayers} onCheckboxToggle={handleCheckboxToggle}/>} />
+              <Route path="/summary/:id" element={<Summary />} />
             </Route>
           
           </Routes>

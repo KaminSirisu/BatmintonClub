@@ -242,5 +242,6 @@
   "Please upload a file": "Please upload a file",
   "Slip uploaded successfully": "Slip uploaded successfully",
   "Upload failed": "Upload failed",
-  "fewestGamesFirst": "Fewest first"
+  "fewestGamesFirst": "Fewest first",
+  "Export to Google Sheets": "Export to Google Sheets"
 }
