@@ -244,5 +244,19 @@
   "Slip uploaded successfully": "อัปโหลดสลิปสำเร็จ",
   "Upload failed": "อัปโหลดไม่สำเร็จ",
   "fewestGamesFirst": "เล่นน้อยก่อน",
-  "Export to Google Sheets": "ส่งออกไปยัง Google Sheets"
+  "Export to Google Sheets": "ส่งออกไปยัง Google Sheets",
+  "Export Data": "ส่งออกข้อมูล",
+  "Enter optional expenses before exporting this session.": "กรอกค่าใช้จ่ายเพิ่มเติมก่อนส่งออกข้อมูลรอบนี้",
+  "Export Date": "วันที่ส่งออก",
+  "Total Paid Court Cost": "ค่าสนามที่จ่ายทั้งหมด",
+  "Total Shuttlecock Cost": "ค่าลูกแบดทั้งหมด",
+  "Cancel": "ยกเลิก",
+  "Exporting...": "กำลังส่งออก...",
+  "Confirm Export Now": "ยืนยันส่งออกตอนนี้",
+  "Overwrite existing export?": "เขียนทับข้อมูลที่ส่งออกไว้แล้ว?",
+  "Data for this date has already been exported. Do you want to overwrite it?": "ข้อมูลของวันนี้ถูกส่งออกไปแล้ว ต้องการเขียนทับหรือไม่?",
+  "Yes, Overwrite": "ใช่ เขียนทับ",
+  "No players with games played to export.": "ไม่มีผู้เล่นที่มีจำนวนเกมให้ส่งออก",
+  "VITE_API_URL is missing.": "ยังไม่ได้ตั้งค่า VITE_API_URL",
+  "Export successful.": "ส่งออกข้อมูลสำเร็จ"
 }

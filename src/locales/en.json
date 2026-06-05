@@ -243,5 +243,19 @@
   "Slip uploaded successfully": "Slip uploaded successfully",
   "Upload failed": "Upload failed",
   "fewestGamesFirst": "Fewest first",
-  "Export to Google Sheets": "Export to Google Sheets"
+  "Export to Google Sheets": "Export to Google Sheets",
+  "Export Data": "Export Data",
+  "Enter optional expenses before exporting this session.": "Enter optional expenses before exporting this session.",
+  "Export Date": "Export Date",
+  "Total Paid Court Cost": "Total Paid Court Cost",
+  "Total Shuttlecock Cost": "Total Shuttlecock Cost",
+  "Cancel": "Cancel",
+  "Exporting...": "Exporting...",
+  "Confirm Export Now": "Confirm Export Now",
+  "Overwrite existing export?": "Overwrite existing export?",
+  "Data for this date has already been exported. Do you want to overwrite it?": "Data for this date has already been exported. Do you want to overwrite it?",
+  "Yes, Overwrite": "Yes, Overwrite",
+  "No players with games played to export.": "No players with games played to export.",
+  "VITE_API_URL is missing.": "VITE_API_URL is missing.",
+  "Export successful.": "Export successful."
 }
